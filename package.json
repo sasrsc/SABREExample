@@ -1,0 +1,21 @@
+{
+  "name": "com-sabre-example-redapp-web-module-src",
+  "version": "1.0.0",
+  "description": "NGV module",
+  "author": {
+    "name": "richard clowes"
+  },
+  "contributors": [],
+  "private": true,
+  "license": "LicenseRef-LICENSE",
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "ngv": {
+    "buildDependencies": {
+      "sabre-ngv-app": "*",
+      "sabre-ngv-core": "*",
+      "sabre-ngv-xp": "*"
+    }
+  }
+}

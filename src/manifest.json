@@ -1,0 +1,14 @@
+{
+  "redappId": "n/a",
+  "bundleSymbolicName": "com.sabre.example.redapp",
+  "bundleName": "example-redapp",
+  "name": "com-sabre-example-redapp-web-module",
+  "contactDetails": {
+    "author": "richard clowes",
+    "email": "richard.clowes@sas.com",
+    "phone": "9195317955",
+    "companyName": "sas",
+    "contactPerson": "richard clowes",
+    "website": "n/a"
+  }
+}
