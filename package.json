@@ -15,7 +15,13 @@
     "buildDependencies": {
       "sabre-ngv-app": "*",
       "sabre-ngv-core": "*",
-      "sabre-ngv-xp": "*"
-    }
+      "sabre-ngv-xp": "*",  
+      "sabre-ngv-redAppSidePanel": "*",
+      "sabre-ngv-communication": "*",
+      "sabre-ngv-forms": "*"
+    },
+    "concierge_version_min": "5.7.0",
+    "runtimeDependencies": {},
+    "testDependencies": {}
   }
 }
