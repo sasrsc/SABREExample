@@ -34,6 +34,8 @@ export class Main extends Module {
     init(): void {
         super.init();
 
+        // kb rc testing gitlab
+
         const xp = getService(ExtensionPointService);
     
         // used for nudge ...
