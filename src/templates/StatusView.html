@@ -1,0 +1,15 @@
+<form class="row">
+    <div class="col-md-12 command-message-response-content">
+        <b>{{t 'Success'}}:</b> {{success}}
+        {{#if messages}}
+        <div>
+            <b>{{t 'Messages'}}:</b>
+            <ol>
+                {{#each messages}}
+                <li>{{this}}</li>
+                {{/each}}
+            </ol>
+        </div>
+        {{/if}}
+    </div>
+</form>

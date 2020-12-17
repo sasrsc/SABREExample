@@ -27,7 +27,7 @@ const initialAreaTextValue: FormsQueuePlaceRq = {
     }
 };
 
-export class QueuePlaceFormComponent extends React.Component<OwnProps, OwnState> {
+export class SasFormComponent extends React.Component<OwnProps, OwnState> {
     state = {
         areaTextValue: this.formatCode(initialAreaTextValue)
     };
@@ -79,7 +79,7 @@ export class QueuePlaceFormComponent extends React.Component<OwnProps, OwnState>
                         <div className='fields-container'>{/**/}
                             <div className="url-field form-group">
                                 <div className="payload-field form-group">
-                                    <label>{t('LABEL_PAYLOAD')}</label>
+                                    <label>My First SAS Form</label>
                                     <textarea rows={10} cols={90} name="payload" id="{{new-random 'payload-field'}}"
                                               className="not-empty form-control input-form payload"
                                               onChange={this.handleChange} value={this.state.areaTextValue} />

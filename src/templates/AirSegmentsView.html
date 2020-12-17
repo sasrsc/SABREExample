@@ -1,0 +1,18 @@
+<div><a target="_blank" href="https://handlebarsjs.com/examples/simple-expressions.html">Handlebars</a>
+    <ol class="air-ol">
+        {{#with air.air}}
+        <li class="Id">Id: {{Id}}</li>
+        <li class="ArrivalLocationCode">Destination airport code: {{Arrival.LocationCode}}</li>
+        <li class="ArrivalScheduleDateTime">Arrival datetime: {{Arrival.ScheduleDateTime}}</li>
+        <li class="DepartureLocationCode">Origin airport code: {{Departure.LocationCode}}</li>
+        <li class="DepartureScheduleDateTime">Departure datetime: {{Departure.ScheduleDateTime}}</li>
+        <li class="MarketingCarrierCode">Marketing airline code: {{MarketingCarrier.Code}}</li>
+        <li class="MarketingCarrierFlightNumber">Marketing airline flight number: {{MarketingCarrier.FlightNumber}}</li>
+        <li class="BookingClass">Booking class: {{BookingClass}}</li>
+        <li class="NumberInParty">Number in party: {{NumberInParty}}</li>
+        <li class="Status">Status: {{Status}}</li>
+        <li class="OrderNumber">OrderNumber: {{OrderNumber}}</li>
+        <li class="SegmentNumber">SegmentNumber: {{SegmentNumber}}</li>
+        {{/with}}
+    </ol>
+</div>

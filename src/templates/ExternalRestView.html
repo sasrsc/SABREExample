@@ -1,0 +1,47 @@
+<div style="float:left">
+    <form>
+        <div class="url-field form-group">
+            <label for="{{new-random 'url-field'}}">URL</label>
+            <input type="text" id="{{new-random 'url-field'}}"
+                   class="not-empty form-control input-form url"
+                   value="https://randomuser.me/api/">
+        </div>
+        <div class="httpMethod-field form-group">
+            <label for="{{new-random 'httpMethod-field'}}">httpMethod</label>
+            <select id="{{new-random 'httpMethod-field'}}"
+                    class="not-empty form-control input-form httpMethod">
+                <option value="GET" selected="selected">GET</option>
+                <option value="POST">POST</option>
+                <option value="PUT">PUT</option>
+                <option value="PATCH">PATCH</option>
+                <option value="DELETE">DELETE</option>
+                <option value="HEAD">HEAD</option>
+                <option value="CONNECT">CONNECT</option>
+                <option value="OPTIONS">OPTIONS</option>
+                <option value="TRACE">TRACE</option>
+            </select>
+
+        </div>
+ 
+        <div class="payload-field form-group">
+            <label for="{{new-random 'payload-field'}}">payload</label>
+            <textarea rows="10" cols="90" name="payload" id="{{new-random 'payload-field'}}"
+                      class="not-empty form-control input-form payload">
+          
+        </textarea>
+        </div>
+        <div class="headers-field form-group">
+            <label for="{{new-random 'headers-field'}}">headers</label>
+            <textarea rows="10" cols="10" name="headers" id="{{new-random 'headers-field'}}"
+                      class="not-empty form-control input-form headers">{ "Content-Type": "application/json" }
+            </textarea>
+        </div>
+    </form>
+</div>
+
+<div style="float: right">
+    <label for="{{new-random 'response-field'}}">Response</label>
+    <textarea rows="30" cols="90" name="response" id="{{new-random 'response-field'}}"
+              class="not-empty form-control input-form response">
+    </textarea>
+</div>

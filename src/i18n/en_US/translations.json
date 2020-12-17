@@ -1,2 +1,8 @@
 {
-}
+    "SUCCESS": "Success",
+    "MESSAGE": "Message",
+    "RESPONSE_STATUS": "Response status",
+    "OPEN_QUEUE_PLACE_BUTT": "Open QueuePlace Form",
+    "OPEN_FORM_PREPARE_PAYLOAD": "Open form to prepare payload",
+    "LABEL_PAYLOAD": "Payload"
+  }

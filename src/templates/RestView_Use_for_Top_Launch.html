@@ -1,0 +1,26 @@
+<div style="float:left">
+    <form>
+        <div class="url-field form-group">
+            <label for="{{new-random 'url-field'}}">URL</label>
+            <input type="text" id="{{new-random 'url-field'}}"
+                   class="not-empty form-control input-form url"
+                   value="/v1/lists/utilities/geocode/locations">
+        </div>
+        <div class="payload-field form-group">
+            <label for="{{new-random 'payload-field'}}">payload</label>
+            <textarea rows="10" cols="90" name="payload" id="{{new-random 'payload-field'}}"
+                      class="not-empty form-control input-form payload">
+                {
+                QueuePlaceRq: {
+                    Queue: [{
+QueueName: 'Name',
+QueueNumber: '123',
+PrefatoryInstructionCode: 'Code',
+PseudoCityCode: 'City'
+}]
+}
+}
+</textarea>
+</div>
+</form>
+</div>

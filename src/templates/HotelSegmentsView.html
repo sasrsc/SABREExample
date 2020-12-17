@@ -1,0 +1,97 @@
+<div>   
+    <table class="table table-striped">
+        <thead>
+            <tr></tr>
+                <th>#</th>
+                <th>Chain</th>
+                <th>Hotel</th>
+                <th>Check In</th>
+                <th>Check Out</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each hotel.hotel}}
+            <tr>
+                <td>{{Id}}</td>
+                <td>{{HotelInformation.ChainCode}}</td>
+                <td>{{HotelInformation.Name}}</td>
+                <td>{{ReservationDetails.CheckIn}}</td>
+                <td>{{ReservationDetails.CheckOut}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
+<form id="HkToYkForm">
+    <div class="form-group">
+        <label for="exampleFormControlSelect1">Example select</label>
+        <select class="form-control" id="hotelsList">
+            <option value="">Choose a hotel</option>
+            {{#each hotel.hotel}}
+            <option value="{{Id}}">{{HotelInformation.ChainCode}} - {{HotelInformation.Name}} - {{ReservationDetails.CheckIn}}</option>
+            {{/each}}
+        </select>
+    </div>
+    <div class="form-row">
+        <div class="form-group col-md-6">
+          <input type="text" class="form-control" id="HotelName">
+        </div>
+        <div class="form-group col-md-6">
+          <input type="text" class="form-control" id="HotelChainCode">
+        </div>
+    </div>
+
+    
+   
+        <div class="form-row">
+            <div class="col-md-3">
+                <label for="ipCheckIn" class="form-label">Check in</label>
+                <input type="date" class="form-control" id="ipCheckIn">
+            </div>
+            <div class="col-md-3">
+                <label for="ipNights">Nights</label>
+                <input type="text" class="form-control" id="ipNights" placeholder="Nights">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="ipCheckOut">Check out</label>
+                <input type="date" class="form-control" id="ipCheckOut">
+            </div>
+            <div class="form-group col-md-3">
+                <label for="ipRoomCount">Number of rooms</label>
+                <input type="text" class="form-control" id="ipRoomCount" placeholder="1">
+            </div>
+        </div>
+        <div>
+            <div class="form-group col-md-4">
+                <label for="ipRoomType">Room type</label>
+                <input type="text" class="form-control" id="ipRoomType" placeholder="ROH">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="ipCurrency">Currency</label>
+                <input type="text" class="form-control" id="ipCurrency" placeholder="USD">
+            </div>
+            <div class="form-group col-md-4">
+                <label for="ipAmount">Amount</label>
+                <input type="text" class="form-control" id="ipAmount" placeholder="Nightly Rate">
+            </div>                     
+        </div>
+        <div>
+            <div class="form-group col-md-6">
+                <label for="ipConfirmationNumber">Confirmation number</label>
+                <input type="text" class="form-control" id="ipConfirmationNumber" placeholder="CF#">
+            </div>
+            <div class="form-group col-md-6">
+                <label for="ipCancelPolicy">Cancellation Policy</label>
+                <input type="text" class="form-control" id="ipCancelPolicy" placeholder="6P">
+            </div>                  
+        </div>
+        <div>
+            <div class="form-group col-md-12">
+                <label for="ipFreeText">Free text</label>
+                <input type="text" class="form-control" id="ipFreeText">
+            </div>                     
+        </div>
+       
+      </form>
+
+</form>

@@ -6,11 +6,12 @@ import StatelessComponent from 'sabre-ngv-UIComponents/baseComponent/components/
 import {AbstractViewOptions} from 'sabre-ngv-app/app/AbstractViewOptions';
 import {SimpleTabControllerComponent} from './SimpleTabControllerComponent';
 
-@CssClass('com-sabre-example redapp-web-module btn btn-default')
+@CssClass('com-sabre-example-redapp-web-module-forms-service btn btn-default')
 @Initial({
-    caption: '<i class="fa fa-edit"></i> <span class="hidden-xs dn-x-hidden-0-8">My Form</span>',
+    caption: '<i class="fa fa-edit"></i> <span class="hidden-xs dn-x-hidden-0-8">SAS Stuff</span>',
     type: 'default'
 })
+
 export default class StaticButton extends AbstractBootstrapPopoverButton {
 
 

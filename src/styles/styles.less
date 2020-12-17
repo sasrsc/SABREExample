@@ -1,3 +1,40 @@
-// Do not modify this styles
-// You can import this file to your stylesheet and use LESS variables and mixins
-@import "../../node_modules/sabre-ngv-app/meta/styles/core-styles.less";
+@import "../../core/styles/core-styles";
+
+.com_sabre_example_redapp_web_module_forms_service {
+  .sample-form-container {
+    .row {
+      margin: 0;
+    }
+
+    .fields-container {
+      padding: 9px 6px 9px 6px;
+    }
+
+    label input {
+      font-size: 10px
+    }
+
+    .input-field {
+      width: 100%;
+    }
+    
+    .text-command-button,.cancel-button {
+      margin: 6px;
+    }
+
+    .input-field-checkbox {
+      margin-left: 12px;
+      margin-right: 12px;
+    }
+
+    .right-buttons {
+      float: right;
+    }
+
+    .buttons-container {
+      background-color: @gray-lighter;
+      border-top: 1px solid @gray-bg;
+      padding: 9px 15px 9px 15px;
+    }
+  }
+}

@@ -15,10 +15,15 @@
     "buildDependencies": {
       "sabre-ngv-app": "*",
       "sabre-ngv-core": "*",
-      "sabre-ngv-xp": "*",  
+      "sabre-ngv-xp": "*",        
+      "sabre-ngv-reservation": "*",
       "sabre-ngv-redAppSidePanel": "*",
+      "sabre-ngv-customCommand": "*",
       "sabre-ngv-communication": "*",
-      "sabre-ngv-forms": "*"
+      "sabre-ngv-forms": "*",
+      "sabre-ngv-UIComponents": "*",
+      "sabre-ngv-pos-cdm": "*",
+      "sabre-ngv-commsg": "*"
     },
     "concierge_version_min": "5.7.0",
     "runtimeDependencies": {},

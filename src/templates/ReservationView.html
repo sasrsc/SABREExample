@@ -1,0 +1,76 @@
+<div>
+    <table class="table travelers-table">
+        <caption class="travelers-title">Travelers</caption>
+        <thead>
+        <tr>
+            <th scope="col">#</th>
+            <th scope="col">NameNumber</th>
+            <th scope="col">GivenName</th>
+            <th scope="col">Surname</th>
+            <th scope="col">Stmt Info</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each reservation.reservation.Passengers.Passenger}}
+        <tr class="traveller-item-{{Id}}">
+            <td class="Id">{{Id}}</td>
+            <td class="NameNumber">{{NameNumber}}</td>
+            <td class="GivenName">{{GivenName}}</td>
+            <td class="Surname">{{Surname}}</td>
+            <td class="Stmt">{{NameReference}}</td>
+
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+
+    <table class="table travelers-table">
+        <caption class="travelers-title">Security Information</caption>
+        <thead>
+        <tr>
+            <th scope="col">Doc. Type</th>
+            <th scope="col">Doc. Number</th>
+            <th scope="col">Expiry Date</th>
+            <th scope="col">Given Name</th>
+            <th scope="col">Surname</th>
+            <th scope="col">Birth Date</th>
+            <th scope="col">Citizenship</th>
+        </tr>
+        </thead>
+        <tbody>
+        {{#each reservation.reservation.SecurityInformationCollection.SecurityInformation}}
+        <tr class="security-information-item">
+            <td class="DocumentTypeCode">{{SecurityInformationDocument.DocumentTypeCode}}</td>
+            <td class="DocumentNumber">{{SecurityInformationDocument.DocumentNumber}}</td>
+            <td class="ExpiryDate">{{SecurityInformationDocument.ExpiryDate}}</td>
+            <td class="GivenName">{{SecurityInformationDocument.GivenName}}</td>
+            <td class="Surname">{{SecurityInformationDocument.Surname}}</td>
+            <td class="Birthdate">{{SecurityInformationDocument.Birthdate}}</td>
+            <td class="ResidenceCountryCode">{{SecurityInformationDocument.ResidenceCountryCode}}</td>
+        </tr>
+        {{/each}}
+        </tbody>
+    </table>
+
+    <table class="table remarks-table">
+        <caption class="remarks-title">Remarks</caption>
+        <thead>
+            <tr>
+                <th scope="col">#</th>
+                <th scope="col">Code</th>
+                <th scope="col">Type</th>
+                <th scope="col">Text</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each reservation.reservation.Remarks.Remark}}
+                <tr class="remark-item-{{OrderNumber}}">
+                    <td class="OrderNumber">{{OrderNumber}}</td>
+                    <td class="Code">{{Code}}</td>
+                    <td class="Type">{{Type}}</td>
+                    <td class="Text">{{Text}}</td>
+                </tr>
+            {{/each}}
+        </tbody>
+    </table>
+</div>
