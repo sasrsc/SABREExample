@@ -9,7 +9,8 @@ import {ICommandMessageService} from 'sabre-ngv-commsg/services/ICommandMessageS
 import {CommandMessageBasicRs, CommandMessageRq} from 'sabre-ngv-pos-cdm/commsg';
 import {LayerService} from 'sabre-ngv-core/services/LayerService';
 import {StatusView} from './StatusView';
-import {NativeSabreCommand} from '../services/NativeSabreCommand';
+import { NativeSabreCommand } from '../services/NativeSabreCommand';
+import {CommandMessageReservationRs, ReservationRs} from "sabre-ngv-pos-cdm/reservation";
 
 const i18n: I18nService = getService(I18nService);
 const t: ScopedTranslator = i18n.getScopedTranslator('com-sabre-example-redapp-web-module/translations');
@@ -29,19 +30,42 @@ export interface OwnProps {
 
 export class HotelSegmentsView extends AbstractView<AbstractModel> {
 
+    private selectedHotel = -1;
+
     initialize(options: AbstractActionOptions) {
         super.initialize(options);
         this.addDomEvents({​​​​
             'change #hotelsList ' : 'getSpecificHotel'
-        }​​​​);
+        });
+        
+        
     }
+
+    getSelectedHotel(): number {
+        return this.selectedHotel;
+    }
+    
+
+    // private isHotelId(hotels) {
+    //     return hotels.Id == 3;
+    // }​​​​
+
+    // private myFunction2(reservation: CommandMessageReservationRs): void {​​
+    //     let hotelfilter = reservation.Data.Segments.HotelSegments.Hotel.findIndex(this.isHotelId);
+    //     console.log(hotelfilter);
+    // }​​
+    
 
     private getSpecificHotel() : void {
         console.log('Hotel has been changed');  
-        //console.log(reservation);     
+        //console.log(hotel);     
         // which hotel
         let thisHotel: number = this.$('#hotelsList').val();
         console.log('Hotel segment selected=' + thisHotel);
+        console.log(AbstractModel);
+//        getService(LayerService).showInModal(new HotelSegmentsView({model: {hotel: {hotel}}}), restModalOptions, {display: 'areaView'});
+
+        //this.myFunction2();
         console.log($('#hotelsList'));
         //let thisHotelDetails: string = Hotel.find(x => x.id === 'thisHotel');
 

@@ -159,11 +159,44 @@ export class Main extends Module {
         }), {title: "Air segments"}, {display: 'areaView'});
     }
 
+    private isHotelId(hotels) {
+        return hotels.Id == 4;
+    }​​​​
+
+    private myFunction2(hotel): void {​​
+        let hotelfilter = hotel.findIndex(this.isHotelId);
+        console.log(hotelfilter);
+    }​​
+
+    private isRemarkSegment(remark) {​​
+        //return remark.Id <= 2;
+        if (remark.SegmentAssociation && remark.SegmentAssociation.SegmentIds==4){​​
+            console.log("true");
+            return true;
+        }​​ else {​​
+            console.log("false");
+            return false;
+        }​​;        
+    }​​
+
+    private myFunction(reservation: ReservationRs) : void {​​
+        console.log("I don't speak Spanish!");
+        //console.log(reservation.Remarks.Remark[0].Id);
+        let remarksfilter = reservation.Remarks.Remark.filter(this.isRemarkSegment);
+        console.log("filter remarks")
+        console.log(remarksfilter);
+    }​​
+    
+
+    
+    
     private displayHotelSegment(commandMessageReservationRs: CommandMessageReservationRs): void {
         var reservation = commandMessageReservationRs['Data'];
         console.log(reservation.Segments.HotelSegments);
         var hotel = reservation.Segments.HotelSegments.Hotel;
         console.log(hotel);
+        this.myFunction2(hotel);
+        this.myFunction(reservation);
 
         let restModalOptions = {
             title: 'Convert HK to Passive',
