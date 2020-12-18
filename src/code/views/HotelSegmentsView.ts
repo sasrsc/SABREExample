@@ -62,11 +62,11 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
   // }​​
 
   private getSpecificHotel(): void {
-    console.log("Hotel has been changed");
+    //console.log("Hotel has been changed");
     //console.log(hotel);
     // which hotel
     let thisHotel: number = this.$("#hotelsList").val();
-    console.log("Hotel segment selected=" + thisHotel);
+    console.log("Hotel segment selected Id=" + thisHotel);
 
     //console.log(this.model);
     let hotels2 = this.getModel().get("hotels");
