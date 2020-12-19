@@ -52,46 +52,49 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
     return this.selectedHotel;
   }
 
-  // private isHotelId(hotels) {
-  //     return hotels.Id == 3;
-  // }​​​​
-
-  // private myFunction2(reservation: CommandMessageReservationRs): void {​​
-  //     let hotelfilter = reservation.Data.Segments.HotelSegments.Hotel.findIndex(this.isHotelId);
-  //     console.log(hotelfilter);
-  // }​​
-
   private getSpecificHotel(): void {
-    //console.log("Hotel has been changed");
-    //console.log(hotel);
+    console.log("Hotel has been changed");
     // which hotel
     let thisHotel: number = this.$("#hotelsList").val();
     console.log("Hotel segment selected Id=" + thisHotel);
 
     //console.log(this.model);
     let hotels2 = this.getModel().get("hotels");
-    console.log(hotels2.hotels);
-    //let modelofhotels: any = this.getModel();
-    //let hotels: any = modelofhotels.gethotels.hotels;
+    // create empty var awaiting the hotel
+    let foundHotel;
 
-    //console.log(hotels);
+    //console.log("Hotel Count=" + hotels2.hotels.length);
 
-    //        getService(LayerService).showInModal(new HotelSegmentsView({model: {hotel: {hotel}}}), restModalOptions, {display: 'areaView'});
+    for (var i = 0; i < hotels2.hotels.length; i++) {
+      var x = hotels2.hotels[i];
+      console.log("Looping thru " + x.Id + " checking for " + thisHotel);
+      if (x.Id == thisHotel) {
+        console.log("Match on " + x.HotelInformation.Name);
+        foundHotel = hotels2.hotels[i];
+        break;
+      }
+    }
+    console.log(foundHotel);
+    var checkin = foundHotel.ReservationDetails.CheckIn.substring(0, 10);
+    var checkout = foundHotel.ReservationDetails.CheckOut.substring(0, 10);
 
-    //this.myFunction2();
-    //console.log($("#hotelsList"));
-    //let thisHotelDetails: string = Hotel.find(x => x.id === 'thisHotel');
-
-    // prepopulate the form
-    //let thisHotelInfo: string = $('#hotelsList').hotel[1];
-    // create var for the selected hotel
-    //$('#HotelName').val(#hotelsList.hotel[1].HotelInformation.Name);
-    //$('#HotelName').val(thisHotelInfo.HotelInformation.Name);
-    // convert 2020-12-17 to 17DEC
-
-    // what api is sabre using
-
-    // 5#S[segment #] something - look in the remarks ..
+    // now prepopulate the form...
+    $("#HotelName").val(foundHotel.HotelInformation.Name);
+    $("#HotelChainCode").val(foundHotel.HotelInformation.ChainCode);
+    $("#ipCheckIn").val(checkin);
+    $("#ipCheckOut").val(checkout);
+    $("#ipNights").val(foundHotel.ReservationDetails.Duration);
+    $("#ipRoomCount").val(foundHotel.ReservationDetails.NumberOfUnits);
+    $("#ipRoomType").val(foundHotel.ReservationDetails.RoomTypeCode);
+    $("#ipCurrency").val(
+      foundHotel.ReservationDetails.Rates.NightlyRate.Currency
+    );
+    $("#ipAmount").val(foundHotel.ReservationDetails.Rates.NightlyRate.Amount);
+    $("#ipConfirmationNumber").val(foundHotel.ReservationDetails.Confirmation);
+    $("#ipCancelPolicy").val(
+      foundHotel.ReservationDetails.CancellationPolicy.PolicyCode
+    );
+    //$("#ipFreeText").val();
   }
 
   selfSubmitModalAction(): void {
