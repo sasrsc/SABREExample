@@ -29,10 +29,17 @@
     background-color: #eaf6ff;
     height: 50px;
   }
+  .row {
+    height: 240px;
+    display: flex;
+  }
+  .navLeft {
+    float: left;
+    background-color: #031459;
+  }
 
   .nav-tabs {
     float: left;
-    border-bottom: 0;
     background-color: #031459;
 
     li {
@@ -67,7 +74,7 @@
       display: none;
       background-color: #fff;
       padding: 1.6rem;
-      height: 240px;
+
       overflow-y: auto;
 
       h3 {
@@ -92,7 +99,7 @@
       }
     }
   }
-  .row {
+  .buttons-container-row {
     margin: 0;
   }
 
@@ -118,15 +125,16 @@
     margin-right: 12px;
   }
 
-  .right-buttons {
-    float: right;
-  }
-
   .buttons-container {
     background-color: #eaf6ff;
     border-bottom: 1px solid transparent;
     padding: 9px 15px 9px 15px;
+    display: flex;
   }
+  .buttons-container > .right-buttons {
+    margin-left: auto;
+  }
+
   .btn-success {
     background-color: #031459;
   }
@@ -188,6 +196,100 @@
       background-color: @gray-lighter;
       border-top: 1px solid @gray-bg;
       padding: 9px 15px 9px 15px;
+    }
+  }
+}
+
+.sas_scripts_grid {
+  display: grid;
+  grid-template-rows: 50px 240px 45px;
+  grid-template-areas:
+    "header header"
+    "sidebar content"
+    "footer footer";
+  grid-template-columns: 1fr 11fr;
+  grid-gap: 0px;
+  overflow: hidden;
+
+  header {
+    grid-area: header;
+    background-color: #eaf6ff;
+    padding: 10px;
+
+    h3 {
+      float: left;
+      margin: 0px;
+    }
+    span {
+      float: right;
+      margin: 0px;
+      padding: 0px;
+    }
+    img {
+      height: 31px;
+      width: 75px;
+    }
+  }
+
+  aside {
+    grid-area: sidebar;
+    background-color: #031459;
+    color: white;
+    padding: 0px;
+
+    li {
+      float: none;
+      margin: 0;
+
+      a {
+        margin-right: 0;
+        border: 0;
+        border-radius: 0;
+
+        &:hover {
+          background-color: #0c97fb;
+        }
+      }
+    }
+
+    .fa {
+      color: #fff;
+    }
+
+    .active .fa {
+      color: #031459;
+    }
+  }
+
+  article {
+    grid-area: content;
+    padding: 10px;
+    overflow-y: auto;
+    .tab-pane {
+      display: none;
+      background-color: #fff;
+      padding: 1rem;
+
+      h3 {
+        margin-top: 0px;
+      }
+    }
+    .active {
+      display: block;
+    }
+  }
+
+  footer {
+    grid-area: footer;
+    background-color: #eaf6ff;
+    border-bottom: 1px solid transparent;
+    padding: 9px 15px;
+    button {
+      float: right;
+      background-color: #031459;
+      &:hover {
+        background-color: #0c97fb;
+      }
     }
   }
 }

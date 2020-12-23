@@ -11,6 +11,7 @@ import { SasFormView } from "./views/SasFormView";
 import { MyPnr } from "./views/MyPnr";
 import StaticButton from "./views/StaticButton";
 import SasScripts from "./views/SasScripts";
+import SASScriptsGrid from "./views/SASScriptsGrid";
 import { NudgeConfig } from "sabre-ngv-xp/configs/NudgeConfig";
 import { NgvNudgeEntry } from "sabre-ngv-xp/interfaces/NgvNudgeEntry";
 import { NudgeEntryView } from "./views/NudgeEntryView";
@@ -188,7 +189,10 @@ export class Main extends Module {
       "novice-buttons",
       new WidgetXPConfig(SasScripts, 9999)
     );
-
+    extensionPointService.addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(SASScriptsGrid, 9999)
+    );
     //used in the graphical pnr example
     //getService(ExtensionPointService).addConfig('novice-buttons', new WidgetXPConfig(StaticButton, -1000));
   }

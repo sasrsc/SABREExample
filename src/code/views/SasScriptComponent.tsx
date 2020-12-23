@@ -58,28 +58,30 @@ export class SasScriptComponent extends React.Component<{}, OwnState> {
           </h3>
         </div>
         <div className="row">
-          <ul className="nav nav-tabs">
-            <li className="active">
-              <a href="#air" data-toggle="tab">
-                <span className="fa fa-plane"></span>
-              </a>
-            </li>
-            <li>
-              <a href="#hotel" data-toggle="tab">
-                <span className="fa fa-bed"></span>
-              </a>
-            </li>
-            <li>
-              <a href="#car" data-toggle="tab">
-                <span className="fa fa-car"></span>
-              </a>
-            </li>
-            <li>
-              <a href="#qc" data-toggle="tab">
-                <span className="fa fa-edit"></span>
-              </a>
-            </li>
-          </ul>
+          <div className="navLeft">
+            <ul className="nav nav-tabs">
+              <li className="active">
+                <a href="#air" data-toggle="tab">
+                  <span className="fa fa-plane"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#hotel" data-toggle="tab">
+                  <span className="fa fa-bed"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#car" data-toggle="tab">
+                  <span className="fa fa-car"></span>
+                </a>
+              </li>
+              <li>
+                <a href="#qc" data-toggle="tab">
+                  <span className="fa fa-edit"></span>
+                </a>
+              </li>
+            </ul>
+          </div>
           <div className="tab-content">
             <div className="tab-pane active" id="air">
               <h3>Air Stuff</h3>
@@ -121,16 +123,14 @@ export class SasScriptComponent extends React.Component<{}, OwnState> {
           </div>
         </div>
         <div className="buttons-container">
-          <div className="row">
-            <div className="right-buttons">
-              <button
-                type="submit"
-                className="search-button js_form-submit btn btn-success"
-                onClick={this.closePopovers}
-              >
-                Close
-              </button>
-            </div>
+          <div className="right-buttons">
+            <button
+              type="submit"
+              className="search-button js_form-submit btn btn-success"
+              onClick={this.closePopovers}
+            >
+              Close
+            </button>
           </div>
         </div>
       </div>
