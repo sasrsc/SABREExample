@@ -8,18 +8,8 @@ import {
   ScopedTranslator,
 } from "sabre-ngv-app/app/services/impl/I18nService";
 import { getService } from "../Context";
-import { ICommandMessageService } from "sabre-ngv-commsg/services/ICommandMessageService";
-import {
-  CommandMessageBasicRs,
-  CommandMessageRq,
-} from "sabre-ngv-pos-cdm/commsg";
-import { LayerService } from "sabre-ngv-core/services/LayerService";
-import { StatusView } from "./StatusView";
 import { NativeSabreCommand } from "../services/NativeSabreCommand";
-import {
-  CommandMessageReservationRs,
-  ReservationRs,
-} from "sabre-ngv-pos-cdm/reservation";
+import { SASUtils } from "../services/SASUtils";
 
 const i18n: I18nService = getService(I18nService);
 const t: ScopedTranslator = i18n.getScopedTranslator(
@@ -40,6 +30,13 @@ export interface OwnProps {
 @Template("com-sabre-example-redapp-web-module:HotelSegmentsView")
 export class HotelSegmentsView extends AbstractView<AbstractModel> {
   private selectedHotel = -1;
+  private haddr1: string;
+  private haddr2: string;
+  private hname: string;
+  private hchaincode: string;
+  private hcitycode: string;
+  private hfone: string;
+  private hprop: string;
 
   initialize(options: AbstractActionOptions) {
     super.initialize(options);
@@ -48,11 +45,37 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
     });
   }
 
+  private convertDate(d) {
+    //console.log(`Converting ${d}`);
+    // format is 2021-07-23
+    var dd = d.substring(8, 10);
+    let mm: number = parseInt(d.substring(5, 7)) - 1;
+    //console.log(`dd=${dd} and mm=${mm}`);
+    var mmm = [
+      "JAN",
+      "FEB",
+      "MAR",
+      "APR",
+      "MAY",
+      "JUN",
+      "JUL",
+      "AUG",
+      "SEP",
+      "OCT",
+      "NOV",
+      "DEC",
+    ][mm];
+
+    var ddmmm = dd + mmm;
+    //console.log(`Converted to ${ddmmm}`);
+    return ddmmm;
+  }
+
   getSelectedHotel(): number {
     return this.selectedHotel;
   }
 
-  private getSpecificHotel(): void {
+  getSpecificHotel(): void {
     console.log("Hotel has been changed");
     // which hotel
     let thisHotel: number = this.$("#hotelsList").val();
@@ -60,11 +83,19 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
 
     //console.log(this.model);
     let hotels2 = this.getModel().get("hotels");
+    console.log("The array=" + hotels2);
     // create empty var awaiting the hotel
+    // this returns undefined - why?
+    let foundHotel2: any = hotels2.hotels.find((h) => h.Id === thisHotel);
+    console.log("3=" + foundHotel2);
+
     let foundHotel;
 
+    // this returns undefined - why?
+    foundHotel = hotels2.hotels.find((h) => h.Id === thisHotel);
+    console.log("1=" + foundHotel);
     //console.log("Hotel Count=" + hotels2.hotels.length);
-
+    //loop through the hotels and find the one where the Id value is thisHotel
     for (var i = 0; i < hotels2.hotels.length; i++) {
       var x = hotels2.hotels[i];
       console.log("Looping thru " + x.Id + " checking for " + thisHotel);
@@ -74,13 +105,21 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
         break;
       }
     }
-    console.log(foundHotel);
+    // this is the hotel object for the chosen hotel
+    //console.log(foundHotel);
+    console.log("2=" + foundHotel);
+
+    // now prepopulate the form...
     var checkin = foundHotel.ReservationDetails.CheckIn.substring(0, 10);
     var checkout = foundHotel.ReservationDetails.CheckOut.substring(0, 10);
 
-    // now prepopulate the form...
-    $("#HotelName").val(foundHotel.HotelInformation.Name);
-    $("#HotelChainCode").val(foundHotel.HotelInformation.ChainCode);
+    this.hname = foundHotel.HotelInformation.Name;
+    this.hchaincode = foundHotel.HotelInformation.ChainCode;
+    this.haddr1 = foundHotel.HotelInformation.Address.AddressLine[0];
+    this.haddr2 = foundHotel.HotelInformation.Address.AddressLine[1];
+    this.hcitycode = foundHotel.HotelInformation.Address.CityCode;
+    this.hfone = foundHotel.HotelInformation.PhoneNumber;
+    this.hprop = foundHotel.HotelInformation.SabreCode;
     $("#ipCheckIn").val(checkin);
     $("#ipCheckOut").val(checkout);
     $("#ipNights").val(foundHotel.ReservationDetails.Duration);
@@ -98,27 +137,35 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
   }
 
   selfSubmitModalAction(): void {
-    console.log("Clicked on Modal footer submit (not a form submit)");
-
+    console.log(
+      "Clicked on Modal footer submit (not a form submit)" + this.haddr1
+    );
+    //console.log(foundHotel);
+    //you can reference the static elements of the found hotel by this.hxxxx as declared at the top of the class stmt
     let showRequest: true;
     let showResponse: true;
 
     // form the GK entry
     //       0HHTAAGK1DFWIN27JUL-OUT2AUG/HI AIRPORT WEST/SGLB/75.00/SI-@5827 OCEAN DRIVE¥MIAMI FL 38834¥PHONE305-
     // 555-1111@RQNEAR POOL/CF89732901
-    let citycode: string = "RDU";
-    let htlchain: string = "ES";
-    let htlname: string = "EMBASSY SUITES CARY";
-    let addr1: string = "201 HARRISON AVE";
-    let addr2: string = "CARY NC 27513";
-    let fone: string = "919-999-9999";
-    let checkIn: string = "27JAN";
-    let checkOut: string = "28JAN";
-    let comm: string = "CMN-NC";
-    let fax: string = "919-666-6666";
-    let propnum: string = "37673";
-    //let checkIn: string = this.$('#ipCheckIn').val();
-    //let checkOut: string = this.$('#ipCheckOut').val();
+    let comm: string = $("#hotelsCommissionable").val();
+    //let fax: string = "919-666-6666"; do we need fax?
+    let ckIn: string = this.$("#ipCheckIn").val();
+    let ckOut: string = this.$("#ipCheckOut").val();
+
+    console.log(`START: Take form value checkin ${ckIn} and convert it `);
+    var ckIn2 = this.convertDate(ckIn);
+    //console.log(ckIn2);
+    console.log(
+      `END: Took form value checkin ${ckIn} and converted it to ${ckIn2}`
+    );
+
+    let ckIn3: string = SASUtils.convertDate(ckIn);
+    console.log(ckIn3);
+
+    //console.log(`Check In 3 = ${ckIn3}`);
+
+    var ckOut2 = this.convertDate(ckOut);
     let rmCount: string = this.$("#ipRoomCount").val();
     let rmType: string = this.$("#ipRoomType").val();
     let curr: string = this.$("#ipCurrency").val();
@@ -126,20 +173,21 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
     let cf: string = this.$("#ipConfirmationNumber").val();
     let cxl: string = this.$("#ipCancelPolicy").val();
     let si: string = this.$("#ipFreeText").val();
+
     let sellentry: string =
       "0HHT" +
-      htlchain +
+      this.hchaincode +
       "GK" +
       rmCount +
-      citycode +
+      this.hcitycode +
       "IN" +
-      checkIn +
+      ckIn2 +
       "-OUT" +
-      checkOut +
+      ckOut2 +
       "/" +
-      htlchain +
+      this.hchaincode +
       " " +
-      htlname +
+      this.hname +
       "/" +
       rmType +
       "/" +
@@ -148,19 +196,16 @@ export class HotelSegmentsView extends AbstractView<AbstractModel> {
       "/G/" +
       comm +
       "/SI-¤" +
-      addr1 +
+      this.haddr1 +
       "¥" +
-      addr2 +
+      this.haddr2 +
       "¥" +
       "FONE " +
-      fone +
-      "¥" +
-      "FAX " +
-      fax +
+      this.hfone +
       "/C-" +
       cxl +
       "*" +
-      propnum +
+      this.hprop +
       "/CF-" +
       cf;
     //let sellentry: string = '5TEST';

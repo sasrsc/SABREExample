@@ -1,6 +1,6 @@
 import { Module } from "sabre-ngv-core/modules/Module";
 import { DtoService } from "sabre-ngv-app/app/services/impl/DtoService";
-import { getService } from "./Context";
+import { getService, context } from "./Context";
 import { ExtensionPointService } from "sabre-ngv-xp/services/ExtensionPointService";
 import { RedAppSidePanelConfig } from "sabre-ngv-xp/configs/RedAppSidePanelConfig";
 import { WidgetXPConfig } from "sabre-ngv-xp/configs/WidgetXPConfig";
@@ -10,6 +10,7 @@ import { LayerService } from "sabre-ngv-core/services/LayerService";
 import { SasFormView } from "./views/SasFormView";
 import { MyPnr } from "./views/MyPnr";
 import StaticButton from "./views/StaticButton";
+import SasScripts from "./views/SasScripts";
 import { NudgeConfig } from "sabre-ngv-xp/configs/NudgeConfig";
 import { NgvNudgeEntry } from "sabre-ngv-xp/interfaces/NgvNudgeEntry";
 import { NudgeEntryView } from "./views/NudgeEntryView";
@@ -32,6 +33,8 @@ import {
 } from "sabre-ngv-pos-cdm/reservation";
 import { AirSegmentsView } from "./views/AirSegmentsView";
 import { HotelSegmentsView } from "./views/HotelSegmentsView";
+import { View } from "./views/View";
+import { QueuePrefsView } from "./views/QueuePrefsView";
 
 export class Main extends Module {
   init(): void {
@@ -103,7 +106,7 @@ export class Main extends Module {
     // used for the right side panel
 
     const sidepanelConfig = new RedAppSidePanelConfig([
-      new RedAppSidePanelButton("Show hello modal", "", () => {
+      new RedAppSidePanelButton("Show hello modal", "sascolor", () => {
         this.showMyHelloModalWindow();
       }),
       new RedAppSidePanelButton("VA Traveler Report", "", () => {
@@ -154,6 +157,16 @@ export class Main extends Module {
         "btn btn-secondary side-panel-button redapp-web-reservation-air",
         () => this.getHotelSegments()
       ),
+      new RedAppSidePanelButton(
+        "Assets",
+        "btn btn-secondary side-panel-button qa-assets-button",
+        () => this.openModalAssets()
+      ),
+      new RedAppSidePanelButton(
+        "QP Prefs",
+        "btn btn-secondary side-panel-button qa-assets-button",
+        () => this.openQueuePlacePrefs()
+      ),
     ]);
 
     //var reservation = {};
@@ -169,7 +182,11 @@ export class Main extends Module {
     );
     extensionPointService.addConfig(
       "novice-buttons",
-      new WidgetXPConfig(StaticButton, -1000)
+      new WidgetXPConfig(StaticButton, 10000)
+    );
+    extensionPointService.addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(SasScripts, 9999)
     );
 
     //used in the graphical pnr example
@@ -552,6 +569,69 @@ export class Main extends Module {
       new GetResView({ model: new AbstractModel() }),
       modalOptions,
       { display: "areaView" }
+    );
+  }
+
+  private openQueuePlacePrefs(): void {
+    var queues = [
+      {
+        PrefNum: 34,
+        Desc: "Goober",
+      },
+      {
+        PrefNum: 56,
+        Desc: "Fool",
+      },
+      {
+        PrefNum: 51,
+        Desc: "Smatie Pants",
+      },
+      {
+        PrefNum: 99,
+        Desc: "Blah blah",
+      },
+    ];
+
+    let restModalOptions = {
+      title: "SAS Queue Prefs",
+      actions: [
+        {
+          className: "app.common.views.Button",
+          caption: "Cancel",
+          actionName: "cancel",
+          type: "secondary",
+        },
+        {
+          className: "app.common.views.Button",
+          caption: "QP",
+          actionName: "submit-modal",
+          type: "success",
+        },
+      ],
+    };
+
+    getService(LayerService).showInModal(
+      new QueuePrefsView({ model: { queues: { queues } } }),
+      restModalOptions,
+      { display: "areaView" }
+    );
+  }
+
+  private openModalAssets(): void {
+    getService(LayerService).showInModal(
+      new View({
+        model: {
+          url: `${
+            context.getModule().getManifest().url
+          }/assets/sabre-logo-white.svg`,
+        },
+      }),
+      {
+        title: "Embedding Assets Sample",
+      },
+      {
+        display: "areaView",
+      }
     );
   }
 }

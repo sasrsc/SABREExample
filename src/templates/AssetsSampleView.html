@@ -1,0 +1,68 @@
+<div class="com-sabre-redapp-example3-web-assets-web-module">
+  Assets may be embedded in one of several ways. These ways are described
+  below.<br /><br />
+
+  Using `${context.getModule().getManifest().url}/assets/sabre-logo-white.svg`
+  passed via model
+  <br />
+  <img src="{{url}}" /> <br /><br />
+
+  Using &lt;img src="modules/com-sabre-example-redapp-web-module/assets/mm.jpg"
+  /&gt; directly in template <br />
+  <img
+    src="modules/com-sabre-example-redapp-web-module/assets/sabre-logo-white.svg"
+  />
+  <br /><br />
+
+  Using &lt;img src="com-sabre-example-redapp-web-module/assets/mm.jpg" /&gt;
+  directly in template <br />
+  <img src="com-sabre-example-redapp-web-module/assets/sabre-logo-white.svg" />
+  <br /><br />
+
+  Using dash-style CSS Variable: &lt;img style=&quot;content:
+  var(--modules--com-sabre-example-redapp-web-module--assets--mm_jpg)&quot;
+  /&gt;<br />
+  <img
+    style="
+      content: var(
+        --modules--com-sabre-example-redapp-web-module--assets--sabre-logo-white_svg
+      );
+    "
+  />
+  <br /><br />
+
+  Using dash-style shortened CSS Variable: &lt;img style=&quot;content:
+  var(--com-sabre-example-redapp-web-module--assets--mm_jpg)&quot; /&gt;<br />
+  <img
+    style="
+      content: var(
+        --com-sabre-example-redapp-web-module--assets--sabre-logo-white_svg
+      );
+    "
+  />
+  <br /><br />
+
+  Using path-style CSS Variable: &lt;img style=&quot;content:
+  var(--modules\/com-com-sabre-example-redapp-web-module\/assets\/mm\.jpg)&quot;
+  /&gt;<br />
+  <img
+    style="
+      content: var(
+        --modules\/com-sabre-example-redapp-web-module\/assets\/sabre-logo-white\.svg
+      );
+    "
+  />
+  <br /><br />
+
+  Using path-style shortened CSS Variable: &lt;img style=&quot;content:
+  var(--com-sabre-example-redapp-web-module-web-module\/assets\/mm\.jpg)&quot;
+  /&gt;<br />
+  <img
+    style="
+      content: var(
+        --com-sabre-example-redapp-web-module\/assets\/sabre-logo-white\.svg
+      );
+    "
+  />
+  <br /><br />
+</div>

@@ -5,6 +5,7 @@
                 <th>#</th>
                 <th>Chain</th>
                 <th>Hotel</th>
+                <th>Prop #</th>
                 <th>Check In</th>
                 <th>Check Out</th>
             </tr>
@@ -15,6 +16,7 @@
                 <td>{{Id}}</td>
                 <td>{{HotelInformation.ChainCode}}</td>
                 <td>{{HotelInformation.Name}}</td>
+                <td>{{HotelInformation.SabreCode}}</td>
                 <td>{{ReservationDetails.CheckIn}}</td>
                 <td>{{ReservationDetails.CheckOut}}</td>
             </tr>
@@ -24,22 +26,17 @@
 </div>
 <form id="HkToYkForm">
     <div class="form-group">
-        <label for="exampleFormControlSelect1">Example select</label>
+        <label for="exampleFormControlSelect1">Choose a HK hotel listed</label>
         <select class="form-control" id="hotelsList">
-            <option value="">Choose a hotel</option>
+            <option value="">Choose a hotel </option>
             {{#each hotels.hotels}}
-            <option value="{{Id}}">{{HotelInformation.ChainCode}} - {{HotelInformation.Name}} - {{ReservationDetails.CheckIn}}</option>
+                {{#if HotelInformation.SabreCode}}
+                    <option value="{{Id}}">{{HotelInformation.ChainCode}} - {{HotelInformation.Name}} - {{ReservationDetails.CheckIn}}</option>
+                {{/if}}
             {{/each}}
         </select>
     </div>
-    <div class="form-row">
-        <div class="form-group col-md-6">
-          <input type="text" class="form-control" id="HotelName">
-        </div>
-        <div class="form-group col-md-6">
-          <input type="text" class="form-control" id="HotelChainCode">
-        </div>
-    </div>
+
     <div class="form-row">
         <div class="col-md-3">
             <label for="ipCheckIn" class="form-label">Check in</label>
@@ -70,17 +67,26 @@
         <div class="form-group col-md-4">
             <label for="ipAmount">Amount</label>
             <input type="text" class="form-control" id="ipAmount" placeholder="Nightly Rate">
-        </div>                     
+        </div>      
+
     </div>
     <div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-4">
             <label for="ipConfirmationNumber">Confirmation number</label>
             <input type="text" class="form-control" id="ipConfirmationNumber" placeholder="CF#">
         </div>
-        <div class="form-group col-md-6">
+        <div class="form-group col-md-4">
             <label for="ipCancelPolicy">Cancellation Policy</label>
             <input type="text" class="form-control" id="ipCancelPolicy" placeholder="6P">
-        </div>                  
+        </div>   
+        
+            <div class="form-group col-md-4">
+            <label for="ipAmount">Commissionable</label>
+             <select class="form-control" id="hotelsCommissionable">
+            <option value="CMN-C">Yes</option>
+            <option value="CMN-NC">No</option>           
+        </select>
+            </div> 
     </div>
     <div>
         <div class="form-group col-md-12">

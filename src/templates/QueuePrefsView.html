@@ -1,0 +1,53 @@
+<div>
+    <form action="">
+
+        <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="qc">
+  <label class="form-check-label" for="qc">
+    Q72
+  </label>
+</div>
+        <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="email">
+  <label class="form-check-label" for="email">
+    Q75
+  </label>
+</div>
+        <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="me">
+  <label class="form-check-label" for="me">
+    Q Me
+  </label>
+</div>
+        <div class="form-check">
+  <input class="form-check-input" type="checkbox" value="" id="me">
+  <label class="form-check-label" for="me">
+    Q Me
+  </label>
+</div>
+<div class="row">
+    <div class="col">
+      <input type="text" class="form-control" id="customq" placeholder="Custom Queue">
+    </div>
+  </div>
+    
+    <table class="table table-striped">
+        <thead>
+            <tr></tr>
+                <th>Action</th>
+                <th>#</th>
+                <th>Description</th>
+            </tr>
+        </thead>
+        <tbody>
+            {{#each queues.queues}}
+            <tr>
+                <td><input type="checkbox" name="" id="qthis{{@index}}"></td>
+                <td>{{PrefNum}}</td>
+                <td>{{Desc}}</td>
+            </tr>
+            {{/each}}
+        </tbody>
+    </table>
+    </form>
+</div>

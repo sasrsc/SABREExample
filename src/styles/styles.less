@@ -1,5 +1,157 @@
 @import "../../core/styles/core-styles";
 
+.sas_scripts_component {
+  .nav-tabs > li.active > a,
+  .nav-tabs > li.active > a:hover,
+  .nav-tabs > li.active > a:focus {
+    border: 0;
+  }
+
+  .panel-heading > .panel-title {
+    float: left;
+  }
+
+  .panel-heading > .x {
+    float: right;
+  }
+
+  .panel-heading > .panel-title > img {
+    height: 31px;
+    width: 75px;
+  }
+
+  .panel-heading {
+    padding: 10px 15px;
+    border-bottom: 1px solid transparent;
+    border-top-right-radius: 2px;
+    border-top-left-radius: 2px;
+    padding: 12px 18px;
+    background-color: #eaf6ff;
+    height: 50px;
+  }
+
+  .nav-tabs {
+    float: left;
+    border-bottom: 0;
+    background-color: #031459;
+
+    li {
+      float: none;
+      margin: 0;
+
+      a {
+        margin-right: 0;
+        border: 0;
+        border-radius: 0;
+        //background-color: #031459;
+
+        &:hover {
+          background-color: #0c97fb;
+        }
+      }
+    }
+
+    .fa {
+      color: #fff;
+    }
+
+    .active .fa {
+      color: #031459;
+    }
+  }
+
+  .tab-content {
+    margin-left: 45px;
+
+    .tab-pane {
+      display: none;
+      background-color: #fff;
+      padding: 1.6rem;
+      height: 240px;
+      overflow-y: auto;
+
+      h3 {
+        margin-top: 0px;
+      }
+    }
+
+    .active {
+      display: block;
+    }
+  }
+
+  .list-group {
+    width: 100%;
+
+    .list-group-item {
+      height: 50px;
+
+      h4,
+      span {
+        line-height: 11px;
+      }
+    }
+  }
+  .row {
+    margin: 0;
+  }
+
+  .fields-container {
+    padding: 9px 6px 9px 6px;
+  }
+
+  label input {
+    font-size: 10px;
+  }
+
+  .input-field {
+    width: 100%;
+  }
+
+  .text-command-button,
+  .cancel-button {
+    margin: 6px;
+  }
+
+  .input-field-checkbox {
+    margin-left: 12px;
+    margin-right: 12px;
+  }
+
+  .right-buttons {
+    float: right;
+  }
+
+  .buttons-container {
+    background-color: #eaf6ff;
+    border-bottom: 1px solid transparent;
+    padding: 9px 15px 9px 15px;
+  }
+  .btn-success {
+    background-color: #031459;
+  }
+  .btn-success.btn-outline:not(.disabled),
+  .btn-success.btn-outline:not([disabled]) {
+    color: #031459;
+    background-color: transparent;
+  }
+}
+.sas-float-left {
+  float: left;
+  width: 25%;
+}
+
+.sas-float-right {
+  float: right;
+}
+
+.sascolor {
+  color: #031459;
+}
+.com-sabre-redapp-example3-web-assets-web-module {
+  background: black;
+  color: white;
+}
 .com_sabre_example_redapp_web_module_forms_service {
   .sample-form-container {
     .row {
@@ -11,14 +163,15 @@
     }
 
     label input {
-      font-size: 10px
+      font-size: 10px;
     }
 
     .input-field {
       width: 100%;
     }
-    
-    .text-command-button,.cancel-button {
+
+    .text-command-button,
+    .cancel-button {
       margin: 6px;
     }
 
