@@ -15,7 +15,7 @@
     "buildDependencies": {
       "sabre-ngv-app": "*",
       "sabre-ngv-core": "*",
-      "sabre-ngv-xp": "*",        
+      "sabre-ngv-xp": "*",
       "sabre-ngv-reservation": "*",
       "sabre-ngv-redAppSidePanel": "*",
       "sabre-ngv-customCommand": "*",

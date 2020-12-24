@@ -4,18 +4,18 @@ import AbstractBootstrapPopoverButton from "sabre-ngv-UIComponents/commandHelper
 import { ChildComponentContent } from "sabre-ngv-UIComponents/commandHelperButton/interfaces/ChildComponentContent";
 import StatelessComponent from "sabre-ngv-UIComponents/baseComponent/components/StatelessComponent";
 import { AbstractViewOptions } from "sabre-ngv-app/app/AbstractViewOptions";
-import { SASScriptsGridVersion } from "./SASScriptsGridVersion";
+import { SASScriptsGridVersion2 } from "./SASScriptsGridVersion2";
 
 @CssClass("com-sabre-example-redapp-web-module-forms-service btn btn-default")
 @Initial({
   caption:
-    '<i class="fa fa-edit"></i> <span class="hidden-xs dn-x-hidden-0-8">SAS Scripts (Grid)</span>',
+    '<i class="fa fa-globe-americas"></i> <span class="hidden-xs dn-x-hidden-0-8">SAS Scripts (Grid) with separate components</span>',
   type: "default",
 })
-export default class SASScriptsGrid extends AbstractBootstrapPopoverButton {
+export default class SASScriptsGrid2 extends AbstractBootstrapPopoverButton {
   private content = new StatelessComponent({
     componentName: "CommandMessagePopover",
-    rootReactComponent: SASScriptsGridVersion,
+    rootReactComponent: SASScriptsGridVersion2,
   });
 
   protected getContent(): ChildComponentContent {
