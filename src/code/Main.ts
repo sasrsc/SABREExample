@@ -194,7 +194,7 @@ export class Main extends Module {
       "novice-buttons",
       new WidgetXPConfig(SASScriptsGrid, 9000)
     );
-        extensionPointService.addConfig(
+    extensionPointService.addConfig(
       "novice-buttons",
       new WidgetXPConfig(SASScriptsGrid2, 9999)
     );
@@ -352,6 +352,32 @@ export class Main extends Module {
         return passenger1.Id - passenger2.Id;
       });
     }
+  }
+
+  private openQueueModal(): void {
+    let restModalOptions = {
+      title: "Rest API",
+      actions: [
+        {
+          className: "app.common.views.Button",
+          caption: "Cancel",
+          actionName: "cancel",
+          type: "secondary",
+        },
+        {
+          className: "app.common.views.Button",
+          caption: "Submit",
+          actionName: "submit-rest-request",
+          type: "secondary",
+        },
+      ],
+    };
+
+    getService(LayerService).showInModal(
+      new RestView({ model: new RestModel() }),
+      restModalOptions,
+      { display: "areaView" }
+    );
   }
 
   private openModalWithRest(): void {

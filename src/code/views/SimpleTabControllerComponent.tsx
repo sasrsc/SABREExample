@@ -4,6 +4,7 @@ import {getService} from '../Context';
 import {AbstractModel} from 'sabre-ngv-app/app/AbstractModel';
 import {QueuePlaceFormComponent} from './QueuePlaceFormComponent';
 import {SASFormExtends} from './SASFormExtends';
+import {CustomCommand} from './CustomCommand'
 import {IFormsService} from 'sabre-ngv-forms/services/IFormsService';
 import {StatusView} from './StatusView';
 import {CommandMessageBasicRs} from 'sabre-ngv-pos-cdm/commsg';
@@ -21,15 +22,24 @@ export const ActionType = Object.freeze({
     openQueuePlaceForm: 'openQueuePlace',
     openFormToFill: 'openFormToFill',
     openSasForm: 'openSasForm',
-    openCommandForm: 'openCommandForm',
+    openCustomCommandForm: 'openCustomCommandForm',
     openSasFormExtends: 'openSasFormExtends',
     openSasFormModal: 'openSasFormModal'
 });
 
 export interface OwnState {
     showFormQueuePlacePayload: boolean,
-    showSASFormExtends: boolean
+    showSASFormExtends: boolean,
+    view: Form,
+    showCustomCommand: boolean
 }
+
+export enum Form {
+    command,
+    queuePlacement
+}
+
+
 
 // export interface OwnProps {
 //     closePopovers: () => void;
@@ -40,7 +50,9 @@ export class SimpleTabControllerComponent extends React.Component<{}, OwnState> 
 
     state: OwnState = {
         showFormQueuePlacePayload: false,
-        showSASFormExtends: false
+        showSASFormExtends: false,
+        view: Form.command,
+        showCustomCommand: false
     };
 
     private closePopovers = (): void => {
@@ -65,6 +77,9 @@ export class SimpleTabControllerComponent extends React.Component<{}, OwnState> 
     private renderSASExtendsForm = (): JSX.Element => {
         return <SASFormExtends closePopovers={this.closePopovers}/>
     };
+    private renderCustomCommand = (): JSX.Element => {
+        return <CustomCommand closePopovers={this.closePopovers}/>
+    };
 
     private handleChange = (type) => (): void => {
         switch (type) {
@@ -77,8 +92,8 @@ export class SimpleTabControllerComponent extends React.Component<{}, OwnState> 
             case ActionType.openSasForm:
                 this.showMySASFormLog();
                 break;
-            case ActionType.openCommandForm:
-                this.showCommandFormModal();
+            case ActionType.openCustomCommandForm:
+                this.toggleShowCustomCommandForm();
                 break;
             case ActionType.openSasFormExtends:
                 this.toggleShowSASFormExtends();
@@ -100,10 +115,17 @@ export class SimpleTabControllerComponent extends React.Component<{}, OwnState> 
         }));
     }
 
+    private toggleShowCustomCommandForm(): void {
+        this.setState(prevState => ({
+            showCustomCommand: !prevState.showCustomCommand
+        }));
+    }
+   
     private showCommandFormModal() : void {
         // something here for the form 
         console.log('I should open a custom command form');
-        // getService(LayerService).showInModal(new SasFormView(),modalOptions);
+        // return <CommandFormComponent closePopovers={this.closePopovers}/>;
+        // getService(LayerService).showInModal(new SasFormView(),modalOptions);         
     }
     private showMySASFormLog() : void {
         // something here for the form 
@@ -149,7 +171,7 @@ export class SimpleTabControllerComponent extends React.Component<{}, OwnState> 
                     <div className='buttons-container'>
                         <button
                             className='cancel-button btn btn-outline btn-success'
-                            onClick={this.handleChange(ActionType.openCommandForm)}>Custom Command</button>
+                            onClick={this.handleChange(ActionType.openCustomCommandForm)}>Custom Command</button>
                         <button
                             className='cancel-button btn btn-outline btn-success'
                             onClick={this.handleChange(ActionType.openQueuePlaceForm)}>{t('Queue Form')}
@@ -172,6 +194,7 @@ export class SimpleTabControllerComponent extends React.Component<{}, OwnState> 
                 </div>
                 {this.state.showFormQueuePlacePayload && this.renderQueuePlaceForm()}
                 {this.state.showSASFormExtends && this.renderSASExtendsForm()}
+                {this.state.showCustomCommand && this.renderCustomCommand()}
             </div>
         )
     }

@@ -5,8 +5,11 @@ import { IFormsService } from "sabre-ngv-forms/services/IFormsService";
 import { SASHeaderTemplate } from "./SASHeaderTemplate";
 import { SASFooterTemplate } from "./SASFooterTemplate";
 import { SASInfoQC } from "./SASInfoQC";
+import { SASQueueSend } from "./SASQueueSend";
+import { SASAppDispatcher } from "./SASAppDispatcherCall";
+import { SASFormModal } from "./SASFormModal";
 const eventBus: AbstractModel = new AbstractModel();
-
+import { LayerService } from "sabre-ngv-core/services/LayerService";
 export interface OwnProps {
   closePopovers: () => void;
 }
@@ -66,6 +69,16 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
                 <span className="fa fa-edit"></span>
               </a>
             </li>
+            <li>
+              <a href="#queues" data-toggle="tab">
+                <span className="fa fa-passport"></span>
+              </a>
+            </li>
+            <li>
+              <a href="#sasappdispatcher" data-toggle="tab">
+                <span className="fa fa-phone-volume"></span>
+              </a>
+            </li>
           </ul>
         </aside>
         <article>
@@ -107,9 +120,11 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
             <h3>Car Stuff</h3>
             <p>Something about hotels goes here.</p>
           </div>
-          <SASInfoQC /> 
+          <SASInfoQC />
+          <SASQueueSend closePopovers={() => {}} />
+          <SASAppDispatcher closePopovers={() => {}} />
         </article>
-        <SASFooterTemplate />        
+        <SASFooterTemplate />
       </div>
     );
   }
