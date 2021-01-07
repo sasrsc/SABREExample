@@ -8,14 +8,20 @@ import { SASInfoQC } from "./SASInfoQC";
 import { SASQueueSend } from "./SASQueueSend";
 import { SASAppDispatcher } from "./SASAppDispatcherCall";
 import { SASFormModal } from "./SASFormModal";
-const eventBus: AbstractModel = new AbstractModel();
+import { Alert, Panel, Badge, Button } from "react-bootstrap";
 import { LayerService } from "sabre-ngv-core/services/LayerService";
+import { SASHotelHKtoGK } from "./SASHotelHKtoGK";
+import { NativeSabreCommand } from "../services/NativeSabreCommand";
+const eventBus: AbstractModel = new AbstractModel();
+
 export interface OwnProps {
   closePopovers: () => void;
 }
 
 export interface OwnState {
   showThis: boolean;
+  firstName: string;
+  lastName: string;
 }
 
 export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
@@ -25,6 +31,8 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
 
   state: OwnState = {
     showThis: true,
+    firstName: "Richard",
+    lastName: "Clowes",
   };
 
   private closePopovers = (): void => {
@@ -41,6 +49,24 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
   private handleCancel = (event: React.MouseEvent<HTMLButtonElement>): void => {
     console.log("I clicked on cancel for the SAS Scripts");
     event.preventDefault();
+  };
+
+  private changeHandler(e) {
+    const field = e.target.name;
+    const value = e.target.value;
+    this.setState({
+      [field]: value,
+    });
+  }
+
+  private submitHandler = async (
+    event: React.FormEvent<HTMLFormElement>
+  ): Promise<void> => {
+    event.preventDefault();
+    console.log(`I clicked on submit`);
+    // send name to sabre
+    let sabreentry = `-${this.state.lastName}/${this.state.firstName}`;
+    getService(NativeSabreCommand).handleSubmit(sabreentry);
   };
 
   render(): JSX.Element {
@@ -79,6 +105,11 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
                 <span className="fa fa-phone-volume"></span>
               </a>
             </li>
+            <li>
+              <a href="#hotelscript" data-toggle="tab">
+                <span className="fa fa-hotel"></span>
+              </a>
+            </li>
           </ul>
         </aside>
         <article>
@@ -110,12 +141,50 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           <div className="tab-pane" id="hotel">
             <h3>Hotel Stuff</h3>
             <p>
-              Something about hotels goes here. Lorem ipsum dolor sit amet
-              consectetur adipisicing elit. Obcaecati fugiat architecto magni
-              placeat. Tempora atque id officiis voluptatum, optio, vel adipisci
-              voluptates placeat alias quis quo? Rerum sunt mollitia neque.
+              <Panel bsStyle="primary">
+                <Panel.Heading>
+                  <Panel.Title componentClass="h3">
+                    Message from Redux
+                  </Panel.Title>
+                </Panel.Heading>
+                <Panel.Body>Lorem</Panel.Body>
+              </Panel>
+              <Alert bsStyle="warning">
+                This is the <Badge>42</Badge>nd warning message
+              </Alert>
+              <Alert bsStyle="danger">This is a danger message</Alert>
             </p>
+            <form className="row g-3" onSubmit={this.submitHandler.bind(this)}>
+              <div className="row">
+                <div className="col-md-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    placeholder="First name"
+                    name="firstName"
+                    aria-label="First name"
+                    onChange={this.changeHandler.bind(this)}
+                    value={this.state.firstName}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <input
+                    type="text"
+                    className="form-control"
+                    name="lastName"
+                    placeholder="Last name"
+                    aria-label="Last name"
+                    onChange={this.changeHandler.bind(this)}
+                    value={this.state.lastName}
+                  />
+                </div>
+                <div className="col-md-3">
+                  <Button type="submit">Submit</Button>
+                </div>
+              </div>
+            </form>
           </div>
+
           <div className="tab-pane" id="car">
             <h3>Car Stuff</h3>
             <p>Something about hotels goes here.</p>
@@ -123,6 +192,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           <SASInfoQC />
           <SASQueueSend closePopovers={() => {}} />
           <SASAppDispatcher closePopovers={() => {}} />
+          <SASHotelHKtoGK closePopovers={() => {}} />
         </article>
         <SASFooterTemplate />
       </div>

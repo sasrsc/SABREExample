@@ -4,6 +4,7 @@ import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 const eventBus: AbstractModel = new AbstractModel();
 import { context } from "../Context";
 import { NativeSabreCommand } from "../services/NativeSabreCommand";
+import { Alert } from "react-bootstrap";
 
 export interface MyProps {
   closePopovers: () => void;
@@ -69,7 +70,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     console.log(`I clicked submit ${event}`);
     //**************************************** */
     let url: string =
-      "http://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.";
+      "https://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.";
     let file: string = `${url}${this.state.filename}`;
     this.setState({
       isLoading: true,
@@ -102,7 +103,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
         console.log("Error reading json file " + err);
         this.setState({
           isError: true,
-          responseMessage: `Error reading json file: ${err}`,
+          responseMessage: `Msg: Error reading json file: ${err}`,
           isLoading: false,
         });
       });
@@ -114,34 +115,37 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     return (
       <div className="tab-pane" id="sasappdispatcher">
         <h3>App Dispatcher Stuff</h3>
+        {this.state.isLoading ? (
+          <div className="alert alert-primary" role="alert">
+            Loading Data....
+          </div>
+        ) : null}
+        {this.state.isError ? (
+          <Alert bsStyle="warning">{this.state.responseMessage}</Alert>
+        ) : null}
         <p>
           The suffix for the api call is:
-          http://sww.sas.com/sww-bin/broker94?_service=appprod94&amp;_program=tasprod.
+          https://sww.sas.com/sww-bin/broker94?_service=appprod94&amp;_program=tasprod.
         </p>
-
-        {this.state.isLoading ? "<p>Loading Data....</p>" : null}
-        {this.state.isError ? "<p>{this.state.responseMessage}</p>" : null}
-
         <form onSubmit={this.handleSubmit} ref="form">
           <div className="fields-container">
-            <div className="row g-3">
-              <div className="col-md-12">
-                <label className="col-md-4 col-form-label">file name ...</label>
-                <div className="col-md-8">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="filename"
-                    placeholder="filename"
-                    aria-label="filename"
-                    id="filename"
-                    value={this.state.filename}
-                    onChange={this.handleChange}
-                  />
-                </div>
+            <div className="row">
+              <label className="col-md-3 col-form-label">file name ...</label>
+              <div className="col-md-9">
+                <input
+                  type="text"
+                  className="form-control"
+                  name="filename"
+                  placeholder="filename"
+                  aria-label="filename"
+                  id="filename"
+                  value={this.state.filename}
+                  onChange={this.handleChange}
+                />
               </div>
             </div>
           </div>
+
           <div className="buttons-container">
             <div className="row">
               <div className="right-buttons">
