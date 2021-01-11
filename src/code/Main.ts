@@ -102,18 +102,32 @@ export class Main extends Module {
       )
     );
 
+    xp.addConfig(
+      "nudge",
+      new NudgeConfig(
+        CUSTOM_ICON_IN_BASE64,
+        "Custom comment about the lodging limits ",
+        [],
+        this.filterForHoteLodgingLimits
+      )
+    );
+
     // initialize your module here
     console.log("Just added the Reservation sample to my redapp");
 
     // used for the right side panel
 
     const sidepanelConfig = new RedAppSidePanelConfig([
-      new RedAppSidePanelButton("Show hello modal", "sascolor", () => {
+      new RedAppSidePanelButton("Show hello modal", "btn btn-secondary", () => {
         this.showMyHelloModalWindow();
       }),
-      new RedAppSidePanelButton("VA Traveler Report", "", () => {
-        this.goToVaReport();
-      }),
+      new RedAppSidePanelButton(
+        "VA Traveler Report",
+        "btn btn-secondary",
+        () => {
+          this.goToVaReport();
+        }
+      ),
       new RedAppSidePanelButton(
         "REST",
         "btn btn-secondary side-panel-button redapp-web-rest redapp-web-rest-internal",
@@ -487,6 +501,17 @@ export class Main extends Module {
   }
 
   // for nudge
+
+  filterForHoteLodgingLimits(entries: NgvNudgeEntry[]): boolean {
+    //console.log(entries);
+
+    return (
+      entries.filter(
+        (entry, index, array) =>
+          entry.location == "HOTEL" && entry.destination == "RDU"
+      ).length > 0
+    );
+  }
 
   filterForNudgeWithManySegmentsPerTrip(entries: NgvNudgeEntry[]): boolean {
     return (

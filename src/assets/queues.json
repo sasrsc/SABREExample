@@ -1,18 +1,62 @@
 [
   {
-    "PrefNum": 34,
-    "Desc": "Goober"
+    "PrefNum": 221,
+    "Desc": "Schedule Change"
   },
   {
-    "PrefNum": 56,
-    "Desc": "Fool"
+    "PrefNum": 226,
+    "Desc": "Seat Assignment"
   },
   {
-    "PrefNum": 51,
-    "Desc": "Smatie Pants"
+    "PrefNum": 227,
+    "Desc": "Hotel Rate change"
   },
   {
-    "PrefNum": 99,
-    "Desc": "Blah blah"
+    "PrefNum": 131,
+    "Desc": "Car Update"
+  },
+  {
+    "PrefNum": 60,
+    "Desc": "Hotel Update"
+  },
+  {
+    "PrefNum": 132,
+    "Desc": "Ground transportation"
+  },
+  {
+    "PrefNum": 233,
+    "Desc": "Remove Historical Segments"
+  },
+  {
+    "PrefNum": 207,
+    "Desc": "Ticket Reissued"
+  },
+  {
+    "PrefNum": 246,
+    "Desc": "No Frill Fare"
+  },
+  {
+    "PrefNum": 228,
+    "Desc": "Accounting Changed"
+  },
+  {
+    "PrefNum": 214,
+    "Desc": "Upgrade alert"
+  },
+  {
+    "PrefNum": 229,
+    "Desc": "Biz/Per Notes"
+  },
+  {
+    "PrefNum": 234,
+    "Desc": "Travel Doc Update"
+  },
+  {
+    "PrefNum": 238,
+    "Desc": "Mileage Reimbursement"
+  },
+  {
+    "PrefNum": 209,
+    "Desc": "Add custom meal rate"
   }
 ]

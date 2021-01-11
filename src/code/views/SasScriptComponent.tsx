@@ -54,7 +54,7 @@ export class SasScriptComponent extends React.Component<{}, OwnState> {
             <i className="fa fa-times"></i>
           </span>
           <h3 className="panel-title">
-            <img src="com-sabre-example-redapp-web-module/assets/sas-logo-midnight.png" />
+            <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
           </h3>
         </div>
         <div className="row">

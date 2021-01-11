@@ -43,7 +43,7 @@ export class SASScriptsGridVersion extends React.Component<{}, OwnState> {
       <div className="sas_scripts_grid">
         <header>
           <h3>
-            <img src="com-sabre-example-redapp-web-module/assets/sas-logo-midnight.png" />
+            <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
           </h3>
           <span onClick={this.closePopovers}>
             <i className="fa fa-times"></i>

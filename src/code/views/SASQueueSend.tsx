@@ -119,12 +119,24 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
       .map(({ PrefNum }) => ({ PrefNum }));
     console.log(match);
     // now create a string to send to sabre
-    let command: any = "QP";
-    match.forEach((i) => {
-      command = command + "/" + i.PrefNum;
-    });
 
-    getService(NativeSabreCommand).handleSubmit(command);
+    let queuePlacement: string = "";
+
+    for (var i = 0; i < match.length; i++) {
+      var x = match[i];
+
+      if (i === 0) {
+        queuePlacement += "QPM/75/" + x.PrefNum;
+      } else {
+        queuePlacement += "¥75/" + x.PrefNum;
+      }
+    }
+
+    if (queuePlacement != "") {
+      console.log(`queuePlacement=${queuePlacement}`);
+
+      getService(NativeSabreCommand).handleSubmit(queuePlacement);
+    }
 
     // Hide popovers before open modal
     this.closePopovers();
@@ -159,7 +171,7 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
 
     return (
       <div className="tab-pane" id="queues">
-        <h3>Queue Stuff</h3>
+        <h3>Queue Placement and Itinerary Alerts</h3>
 
         {this.state.isLoading ? "<p>Loading Data....</p>" : null}
 
@@ -188,67 +200,24 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
               </div>
             ))}
             {/* end of repeat row */}
-            <div className="row g-3">
-              <div className="col-md-6">
-                <input
-                  type="text"
-                  className="form-control"
-                  placeholder="First name"
-                  name="firstName"
-                  aria-label="First name"
-                  value={this.state.firstName}
-                  onChange={this.handleChange}
-                />
-              </div>
-              <div className="col-md-6">
-                <input
-                  type="text"
-                  className="form-control"
-                  name="lastName"
-                  placeholder="Last name"
-                  aria-label="Last name"
-                  value={this.state.lastName}
-                  onChange={this.handleChange}
-                />
-              </div>
-            </div>
-            <div className="row g-3">
-              <div className="col-md-12">
-                <label className="col-md-4 col-form-label">
-                  SABRE entry...
-                </label>
-                <div className="col-md-8">
-                  <input
-                    type="text"
-                    className="form-control"
-                    name="command"
-                    placeholder="First name"
-                    aria-label="First name"
-                    id="command"
-                    value={this.state.command}
-                    onChange={this.handleChange}
-                  />
+            <div className="buttons-container">
+              <div className="row">
+                <div className="right-buttons">
+                  <button
+                    id="cancel-button"
+                    className="cancel-button btn btn-outline btn-success"
+                    onClick={this.handleCancel}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    id="submit-button"
+                    className="submit-button btn btn-success"
+                  >
+                    Submit
+                  </button>
                 </div>
-              </div>
-            </div>
-          </div>
-          <div className="buttons-container">
-            <div className="row">
-              <div className="right-buttons">
-                <button
-                  id="cancel-button"
-                  className="cancel-button btn btn-outline btn-success"
-                  onClick={this.handleCancel}
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  id="submit-button"
-                  className="submit-button btn btn-success"
-                >
-                  Submit
-                </button>
               </div>
             </div>
           </div>

@@ -194,7 +194,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           <SASAppDispatcher closePopovers={() => {}} />
           <SASHotelHKtoGK closePopovers={() => {}} />
         </article>
-        <SASFooterTemplate />
+        {/* <SASFooterTemplate /> */}
       </div>
     );
   }
