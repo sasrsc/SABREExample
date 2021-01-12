@@ -202,11 +202,10 @@
 
 .sas_scripts_grid {
   display: grid;
-  grid-template-rows: 50px 240px 45px;
+  grid-template-rows: 50px 300px;
   grid-template-areas:
     "header header"
-    "sidebar content"
-    "footer footer";
+    "sidebar content";
   grid-template-columns: 1fr 11fr;
   grid-gap: 0px;
   overflow: hidden;
@@ -236,6 +235,10 @@
     background-color: #031459;
     color: white;
     padding: 0px;
+
+    .nav-tabs {
+      border-bottom: none;
+    }
 
     li {
       float: none;
@@ -279,19 +282,19 @@
     }
   }
 
-  footer {
-    grid-area: footer;
-    background-color: #eaf6ff;
-    border-bottom: 1px solid transparent;
-    padding: 9px 15px;
-    button {
-      float: right;
-      background-color: #031459;
-      &:hover {
-        background-color: #0c97fb;
-      }
-    }
-  }
+  // footer {
+  //   grid-area: footer;
+  //   background-color: #eaf6ff;
+  //   border-bottom: 1px solid transparent;
+  //   padding: 9px 15px;
+  //   button {
+  //     float: right;
+  //     background-color: #031459;
+  //     &:hover {
+  //       background-color: #0c97fb;
+  //     }
+  //   }
+  // }
 }
 
 .tabsexample {
@@ -307,5 +310,86 @@
   }
   .nav-pills {
     margin-right: 20px;
+  }
+}
+
+.sas_scripts_grid_bs {
+  header {
+    background-color: #eaf6ff;
+    padding: 10px;
+    height: 60px;
+
+    h3 {
+      float: left;
+      margin: 0px;
+    }
+    span {
+      float: right;
+      margin: 0px;
+      padding: 0px;
+    }
+    img {
+      height: 31px;
+      width: 75px;
+    }
+  }
+
+  aside {
+    background-color: #031459;
+    color: white;
+    padding: 0px;
+    width: 50px;
+    float: left;
+
+    .nav-tabs {
+      border-bottom: none;
+    }
+
+    li {
+      float: none;
+      margin: 0;
+
+      a {
+        margin-right: 0;
+        border: 0;
+        border-radius: 0;
+
+        &:hover {
+          background-color: #0c97fb;
+        }
+      }
+    }
+
+    .fa {
+      color: #fff;
+    }
+
+    .active .fa {
+      color: #031459;
+    }
+  }
+
+  article {
+    padding: 0px 10px;
+    margin-left: 40px;
+    overflow-y: auto;
+
+    .tab-pane {
+      display: none;
+      background-color: #fff;
+      padding: 1rem;
+
+      h1,
+      h2,
+      h3,
+      h4,
+      h5,
+      h6 {
+        margin-top: 0px;
+      }
+    }
+    .active {
+      display: block;
+    }
   }
 }

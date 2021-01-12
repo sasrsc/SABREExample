@@ -9,7 +9,7 @@ import { SASScriptsGridVersion } from "./SASScriptsGridVersion";
 @CssClass("com-sabre-example-redapp-web-module-forms-service btn btn-default")
 @Initial({
   caption:
-    '<i class="fa fa-edit"></i> <span class="hidden-xs dn-x-hidden-0-8">SAS Scripts (Grid)</span>',
+    '<i class="fa fa-edit"></i> <span class="hidden-xs dn-x-hidden-0-8">Layout Example</span>',
   type: "default",
 })
 export default class SASScriptsGrid extends AbstractBootstrapPopoverButton {

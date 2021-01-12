@@ -347,7 +347,9 @@ export class SASHotelHKtoGK extends React.Component<MyProps, MyState> {
   ): Promise<void> => {
     event && event.preventDefault();
     console.log(`I clicked submit ${event}`);
-
+    // form the GK entry
+    //       0HHTAAGK1DFWIN27JUL-OUT2AUG/HI AIRPORT WEST/SGLB/75.00/SI-@5827 OCEAN DRIVE¥MIAMI FL 38834¥PHONE305-555-1111@RQNEAR POOL/CF89732901
+    // /3/   0HHTMCGK1DENIN17JUL-OUT18JUL/MC MARRIOTT DEN AIRPORT GATEWAY/REGA00/229.00USD/G/CMN-NC/SI-¤16455 E 40TH CIRCLE¥AURORA CO 80011¥FONE 303-371-4333¤C-01D*44985/CF-84102904-
     // take date in the format YYYY-MM-DD and returns DDMMM 2021-01-15 to 15JAN
     let newCheckIn: string = SASUtils.convertDate(this.state.ipCheckIn);
     let newCheckOut: string = SASUtils.convertDate(this.state.ipCheckOut);
