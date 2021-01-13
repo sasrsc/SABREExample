@@ -59,7 +59,7 @@ export class SASScriptsGridVersion extends React.Component<{}, OwnState> {
             </li>
             <li>
               <a href="#3" data-toggle="tab">
-                <span className="fa fa-car"></span>
+                <span className="fa fa-check-square"></span>
               </a>
             </li>
           </ul>
