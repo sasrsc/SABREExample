@@ -385,10 +385,10 @@ export class SASHotelHKtoGK extends React.Component<MyProps, MyState> {
       "¥" +
       "FONE " +
       this.state.thisHotel.HotelInformation.PhoneNumber +
-      "¤C-" +
-      this.state.ipCancelPolicy +
-      "*" +
+      "¤PC" +
       this.state.thisHotel.HotelInformation.SabreCode +
+      "/C-" +
+      this.state.ipCancelPolicy +
       "/CF-" +
       this.state.ipConfirmationNumber;
 
@@ -443,8 +443,6 @@ export class SASHotelHKtoGK extends React.Component<MyProps, MyState> {
 
     return (
       <div className="tab-pane" id="hotelscript">
-        <p>Convert HK to Passive Segment</p>
-
         <form id="FormHkToYk" onSubmit={this.handleSubmit} ref="form">
           <div className="form-row">
             <div className="form-group col-md-11">

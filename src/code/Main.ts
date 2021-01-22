@@ -9,7 +9,7 @@ import { LayerService } from "sabre-ngv-core/services/LayerService";
 //import { BasicView } from './views/BasicView';
 import { SasFormView } from "./views/SasFormView";
 import { MyPnr } from "./views/MyPnr";
-import StaticButton from "./views/StaticButton";
+
 import SasScripts from "./views/SasScripts";
 import SASScriptsGrid from "./views/SASScriptsGrid";
 import SASScriptsGrid2 from "./views/SASScriptsGrid2";
@@ -18,8 +18,10 @@ import { NgvNudgeEntry } from "sabre-ngv-xp/interfaces/NgvNudgeEntry";
 import { NudgeEntryView } from "./views/NudgeEntryView";
 import { MyHelloModalWindow } from "./views/MyHelloModalWindow";
 import { BasicModel } from "./models/BasicModel";
+import { PersistModel } from "./models/PersistModel";
 import { SampleCustomCommandHandler } from "./services/SampleCustomCommandHandler";
 import { NativeSabreCommand } from "./services/NativeSabreCommand";
+import { LocalStore } from "./services/LocalStore";
 import { registerService } from "./Context";
 import { SoapView } from "./views/SoapView";
 import { GetResView } from "./views/GetResView";
@@ -38,7 +40,15 @@ import { HotelSegmentsView } from "./views/HotelSegmentsView";
 import { View } from "./views/View";
 import { QueuePrefsView } from "./views/QueuePrefsView";
 
+import { PRCustomCommandHandler } from "./services/PRCustomCommandHandler";
+import { LocalStoreHelperService } from "./services/LocalStoreHelperService";
+import { BasicView } from "./views/BasicView";
+import StaticButton from "./views/StaticButton";
+import StaticButtonPersist from "./views/StaticButtonPersist";
+
 export class Main extends Module {
+  localStore: LocalStore;
+
   init(): void {
     super.init();
 
@@ -85,7 +95,7 @@ export class Main extends Module {
     xp.addConfig(
       "nudge",
       new NudgeConfig(
-        CUSTOM_ICON_IN_BASE64,
+        "WARNING",
         "Redapp Web Nudge without action for AirAvailability",
         [],
         this.filterForNudgeWithoutAction
@@ -95,7 +105,7 @@ export class Main extends Module {
     xp.addConfig(
       "nudge",
       new NudgeConfig(
-        CUSTOM_ICON_IN_BASE64,
+        "INFO",
         "Redapp Web Nudge for AirAvailability with many segments per trip",
         [],
         this.filterForNudgeWithManySegmentsPerTrip
@@ -105,7 +115,7 @@ export class Main extends Module {
     xp.addConfig(
       "nudge",
       new NudgeConfig(
-        CUSTOM_ICON_IN_BASE64,
+        "INFO",
         "Custom comment about the lodging limits ",
         [],
         this.filterForHoteLodgingLimits
@@ -183,14 +193,30 @@ export class Main extends Module {
         "btn btn-secondary side-panel-button qa-assets-button",
         () => this.openQueuePlacePrefs()
       ),
+
+      new RedAppSidePanelButton(
+        "Open persist view",
+        "btn btn-secondary side-panel-button qa-assets-button",
+        () => this.showPersist()
+      ),
     ]);
 
+    xp.addConfig("redAppSidePanel", sidepanelConfig);
     //var reservation = {};
 
     registerService(SampleCustomCommandHandler);
     registerService(NativeSabreCommand);
+    registerService(PRCustomCommandHandler);
+    registerService(LocalStoreHelperService);
 
-    xp.addConfig("redAppSidePanel", sidepanelConfig);
+    this.localStore = new LocalStore();
+
+    getService(PRCustomCommandHandler).setLocalStore(this.localStore);
+
+    const button: StaticButtonPersist = new StaticButtonPersist(
+      this.localStore.store
+    );
+    xp.addConfig("novice-buttons", new WidgetXPConfig(button, -1000));
 
     // used for the form
     const extensionPointService: ExtensionPointService = getService(
@@ -215,6 +241,26 @@ export class Main extends Module {
 
     //used in the graphical pnr example
     //getService(ExtensionPointService).addConfig('novice-buttons', new WidgetXPConfig(StaticButton, -1000));
+  }
+
+  private showPersist(): void {
+    let addRemarkModalOptions = {
+      title: "Modal with session persistence",
+      actions: [
+        {
+          className: "app.common.views.Button",
+          caption: "OK",
+          actionName: "cancel",
+          type: "secondary",
+        },
+      ],
+    };
+
+    getService(LayerService).showInModal(
+      new BasicView({ model: new PersistModel(this.localStore) }),
+      addRemarkModalOptions,
+      { display: "areaView" }
+    );
   }
 
   private getReservation(): void {
@@ -503,12 +549,11 @@ export class Main extends Module {
   // for nudge
 
   filterForHoteLodgingLimits(entries: NgvNudgeEntry[]): boolean {
-    //console.log(entries);
-
     return (
       entries.filter(
         (entry, index, array) =>
-          entry.location == "HOTEL" && entry.destination == "RDU"
+          entry.location == "HOTEL" &&
+          (entry.destination == "RDU" || entry.origin == "RDU")
       ).length > 0
     );
   }

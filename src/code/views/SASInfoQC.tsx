@@ -6,6 +6,9 @@ import { LayerService } from "sabre-ngv-core/services/LayerService";
 const eventBus: AbstractModel = new AbstractModel();
 import { SASFormModal } from "./SASFormModal";
 import { ModalWithTabs } from "./ModalWithTabs";
+import { Data } from "../services/LocalStore";
+import { LocalStoreHelperService } from "../services/LocalStoreHelperService";
+import { connect } from "react-redux";
 //import { SASQueuePrefsRender } from "./SASQueuePrefsRender";
 import {
   Modal,
@@ -20,6 +23,7 @@ import {
 export interface MyState {
   show: boolean;
   comment: string;
+  someText: string;
 }
 export class SASInfoQC extends React.Component<{}, MyState> {
   constructor(props = {}) {
@@ -28,6 +32,7 @@ export class SASInfoQC extends React.Component<{}, MyState> {
     this.state = {
       show: false,
       comment: "Can you see me?",
+      someText: "Component state",
     };
 
     this.closePopovers = this.closePopovers.bind(this);
@@ -35,6 +40,12 @@ export class SASInfoQC extends React.Component<{}, MyState> {
     this.handleClose = this.handleClose.bind(this);
     this.handleShow = this.handleShow.bind(this);
   }
+
+  // state: MyState = {
+  //   show: false,
+  //   comment: "Can you see me?",
+  //   someText: "Component state",
+  // };
 
   closePopovers() {
     //console.log('We need to close this popover');
@@ -44,29 +55,8 @@ export class SASInfoQC extends React.Component<{}, MyState> {
   showSASQueuePrefsRender = (e) => {
     e.preventDefault();
     console.log("I clicked on opening a render window" + e);
-    // const modalOptions = {
-    //   title: "SAS Modal Window",
-    //   actions: [
-    //     {
-    //       className: "app.common.views.Button",
-    //       caption: "Cancel",
-    //       actionName: "handleCancel",
-    //       type: "secondary",
-    //     },
-    //     {
-    //       className: "app.common.views.Button",
-    //       caption: "Submit",
-    //       actionName: "handleSubmit",
-    //       type: "secondary",
-    //     },
-    //   ],
-    // };
-    // getService(LayerService).showInModal(
-    //   new SASQueuePrefsRender(),
-    //   { title: "SAS Modal" },
-    //   { display: "areaView" }
-    // );
   };
+
   showModalWithTabs = (e) => {
     e.preventDefault();
     console.log("The link was clicked.");
@@ -84,6 +74,7 @@ export class SASInfoQC extends React.Component<{}, MyState> {
       { display: "areaView" }
     );
   };
+
   showopenSasFormModal = (e) => {
     e.preventDefault();
     console.log("The link was clicked.");
@@ -139,8 +130,13 @@ export class SASInfoQC extends React.Component<{}, MyState> {
   render(): JSX.Element {
     return (
       <div className="tab-pane" id="qc">
-        <h3>QC Stuff</h3>
+        <p>This value comes from the LocalStore...</p>
         <p>Something about QC goes here.</p>
+        <p>
+          <a href="mailto:Richard.Clowes@sas.com?subject=goober">
+            Mail Richard
+          </a>
+        </p>
         <p>
           Can I invoke a{" "}
           <a href="#" onClick={this.showopenSasFormModal}>
@@ -187,7 +183,9 @@ export class SASInfoQC extends React.Component<{}, MyState> {
           <Modal.Body>
             <h4>Text in a modal</h4>
             <p>
-              Duis mollis, est non commodo luctus, nisi erat porttitor ligula.
+              <a href="mailto:Richard.Clowes@sas.com?subject=goober">
+                Mail Richard
+              </a>
             </p>
 
             <hr />
@@ -212,3 +210,17 @@ export class SASInfoQC extends React.Component<{}, MyState> {
     );
   }
 }
+
+// const mapStateToProps = (state: Data): { messageFromStore } => {
+//   const currentMessageName = getService(
+//     LocalStoreHelperService
+//   ).getCurrentMessageName();
+
+//   return {
+//     messageFromStore: state[currentMessageName],
+//   };
+// };
+
+// export const SASInfoQCWithStore = connect<{ messageFromStore }, {}, {}>(
+//   mapStateToProps
+// )(SASInfoQC);

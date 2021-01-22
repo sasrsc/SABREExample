@@ -4,7 +4,18 @@ import { Data, LocalStore } from "../services/LocalStore";
 
 const eventBus: AbstractModel = new AbstractModel();
 
-export class SASHeaderTemplate extends React.Component {
+export interface MyProps {
+  headertext: string;
+}
+
+export interface MyState {
+  someText: string;
+}
+
+export class SASHeaderTemplateContext extends React.Component<
+  MyProps,
+  MyState
+> {
   constructor(props) {
     super(props);
 
@@ -20,7 +31,7 @@ export class SASHeaderTemplate extends React.Component {
     return (
       <header>
         <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
-        <h3></h3>
+        <h3>{this.props.headertext}</h3>
         <span onClick={this.closePopovers}>
           <i className="fa fa-times"></i>
         </span>

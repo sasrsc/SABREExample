@@ -2,16 +2,28 @@ import * as React from "react";
 import { getService } from "../Context";
 import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 import { IFormsService } from "sabre-ngv-forms/services/IFormsService";
-import { SASHeaderTemplate } from "./SASHeaderTemplate";
+import { SASHeaderTemplateContext } from "./SASHeaderTemplateContext";
 import { SASFooterTemplate } from "./SASFooterTemplate";
 import { SASInfoQC } from "./SASInfoQC";
 import { SASQueueSend } from "./SASQueueSend";
 import { SASAppDispatcher } from "./SASAppDispatcherCall";
 import { SASFormModal } from "./SASFormModal";
-import { Alert, Panel, Badge, Button } from "react-bootstrap";
+import {
+  Alert,
+  Panel,
+  Badge,
+  Button,
+  FormGroup,
+  FormControl,
+  ControlLabel,
+  InputGroup,
+} from "react-bootstrap";
 import { LayerService } from "sabre-ngv-core/services/LayerService";
 import { SASHotelHKtoGK } from "./SASHotelHKtoGK";
 import { NativeSabreCommand } from "../services/NativeSabreCommand";
+import { PersistModel } from "../models/PersistModel";
+import { Data, LocalStore } from "../services/LocalStore";
+
 const eventBus: AbstractModel = new AbstractModel();
 
 export interface OwnProps {
@@ -22,18 +34,33 @@ export interface OwnState {
   showThis: boolean;
   firstName: string;
   lastName: string;
+  headerText: string;
 }
 
 export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
+  constructor(props = {}) {
+    super(props);
+
+    this.state = {
+      showThis: true,
+      firstName: "Richard",
+      lastName: "Clowes",
+      headerText: "Air Info",
+    };
+
+    this.handleClick = this.handleClick.bind(this);
+  }
+
   private readonly formsService: IFormsService = getService<IFormsService>(
     IFormsService
   );
 
-  state: OwnState = {
-    showThis: true,
-    firstName: "Richard",
-    lastName: "Clowes",
-  };
+  // state: OwnState = {
+  //   showThis: true,
+  //   firstName: "Richard",
+  //   lastName: "Clowes",
+  //   headerText: "Passed from Gridv2",
+  // };
 
   private closePopovers = (): void => {
     eventBus.triggerOnEventBus("hide-popovers", "novice-menu");
@@ -69,44 +96,84 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
     getService(NativeSabreCommand).handleSubmit(sabreentry);
   };
 
+  private handleClick = (txt: string) => (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    //console.log("The link was clicked.");
+    //console.log(e);
+
+    this.setState({
+      headerText: txt,
+    });
+  };
+
   render(): JSX.Element {
     return (
       <div className="sas_scripts_grid">
-        <SASHeaderTemplate />
+        <SASHeaderTemplateContext headertext={this.state.headerText} />
         <aside>
           <ul className="nav nav-tabs">
             <li className="active">
-              <a href="#air" data-toggle="tab">
+              <a
+                href="#air"
+                onClick={this.handleClick("Air Info")}
+                data-toggle="tab"
+              >
                 <span className="fa fa-plane"></span>
               </a>
             </li>
             <li>
-              <a href="#hotel" data-toggle="tab">
+              <a
+                href="#hotel"
+                onClick={this.handleClick("Hotel Info")}
+                data-toggle="tab"
+              >
                 <span className="fa fa-bed"></span>
               </a>
             </li>
             <li>
-              <a href="#car" data-toggle="tab">
+              <a
+                href="#car"
+                onClick={this.handleClick("Car Info")}
+                data-toggle="tab"
+              >
                 <span className="fa fa-car"></span>
               </a>
             </li>
             <li>
-              <a href="#qc" data-toggle="tab">
+              <a
+                href="#qc"
+                onClick={this.handleClick("QC Info")}
+                data-toggle="tab"
+              >
                 <span className="fa fa-edit"></span>
               </a>
             </li>
             <li>
-              <a href="#queues" data-toggle="tab">
+              <a
+                href="#queues"
+                onClick={this.handleClick(
+                  "Queue Placement and Itinerary Alerts"
+                )}
+                data-toggle="tab"
+              >
                 <span className="fa fa-passport"></span>
               </a>
             </li>
             <li>
-              <a href="#sasappdispatcher" data-toggle="tab">
+              <a
+                href="#sasappdispatcher"
+                onClick={this.handleClick("App Dispatcher Info")}
+                data-toggle="tab"
+              >
                 <span className="fa fa-phone-volume"></span>
               </a>
             </li>
             <li>
-              <a href="#hotelscript" data-toggle="tab">
+              <a
+                href="#hotelscript"
+                onClick={this.handleClick("Passive Hotel")}
+                data-toggle="tab"
+              >
                 <span className="fa fa-hotel"></span>
               </a>
             </li>
@@ -114,7 +181,6 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
         </aside>
         <article>
           <div className="tab-pane active" id="air">
-            <h3>Air Stuff</h3>
             <ul className="list-group pull-left">
               <li className="list-group-item">This script</li>
               <li className="list-group-item">That script</li>
@@ -139,7 +205,6 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
             </p>
           </div>
           <div className="tab-pane" id="hotel">
-            <h3>Hotel Stuff</h3>
             <p>
               <Panel bsStyle="primary">
                 <Panel.Heading>
@@ -154,7 +219,56 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
               </Alert>
               <Alert bsStyle="danger">This is a danger message</Alert>
             </p>
-            <form className="row g-3" onSubmit={this.submitHandler.bind(this)}>
+            <form onSubmit={this.submitHandler.bind(this)}>
+              <FormGroup>
+                <InputGroup>
+                  <FormControl type="text" />
+                  <InputGroup.Addon>@</InputGroup.Addon>
+                </InputGroup>
+              </FormGroup>
+              <FormGroup>
+                <InputGroup>
+                  <FormControl
+                    type="text"
+                    placeholder="Header Text"
+                    name="headerText"
+                    onChange={this.changeHandler.bind(this)}
+                    value={this.state.headerText}
+                  />
+                  <InputGroup.Addon> - </InputGroup.Addon>
+                </InputGroup>
+              </FormGroup>
+              <FormGroup>
+                <InputGroup>
+                  <FormControl
+                    type="text"
+                    placeholder="First name"
+                    name="testName"
+                    onChange={this.changeHandler.bind(this)}
+                    value={this.state.firstName}
+                  />
+                  <InputGroup.Addon>
+                    <i className="fa fa-minus" />
+                  </InputGroup.Addon>
+                </InputGroup>
+              </FormGroup>
+
+              <div className="input-group mb-3">
+                <input
+                  type="text"
+                  className="form-control"
+                  placeholder="First name"
+                  name="testName"
+                  aria-label="First name"
+                  onChange={this.changeHandler.bind(this)}
+                  value={this.state.firstName}
+                />
+                <div className="input-group-append">
+                  <span className="input-group-text" id="basic-addon1">
+                    @
+                  </span>
+                </div>
+              </div>
               <div className="row">
                 <div className="col-md-3">
                   <input
@@ -186,7 +300,6 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           </div>
 
           <div className="tab-pane" id="car">
-            <h3>Car Stuff</h3>
             <p>Something about hotels goes here.</p>
           </div>
           <SASInfoQC />

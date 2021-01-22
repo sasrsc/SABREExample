@@ -171,8 +171,6 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
 
     return (
       <div className="tab-pane" id="queues">
-        <h3>Queue Placement and Itinerary Alerts</h3>
-
         {this.state.isLoading ? "<p>Loading Data....</p>" : null}
 
         <form onSubmit={this.handleSubmit} ref="form">

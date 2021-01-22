@@ -69,9 +69,12 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     event && event.preventDefault();
     console.log(`I clicked submit ${event}`);
     //**************************************** */
-    let url: string =
-      "https://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.";
-    let file: string = `${url}${this.state.filename}`;
+    // let url: string =
+    //   "https://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.";
+
+    let url: string = "https://travel.sas.com/";
+    //let file: string = `${url}${this.state.filename}`;
+    let file: string = `${url}`;
     this.setState({
       isLoading: true,
     });
@@ -114,7 +117,6 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
   render(): JSX.Element {
     return (
       <div className="tab-pane" id="sasappdispatcher">
-        <h3>App Dispatcher Stuff</h3>
         {this.state.isLoading ? (
           <div className="alert alert-primary" role="alert">
             Loading Data....

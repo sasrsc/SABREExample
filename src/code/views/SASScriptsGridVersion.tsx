@@ -2,7 +2,7 @@ import * as React from "react";
 import { getService } from "../Context";
 import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 import { IFormsService } from "sabre-ngv-forms/services/IFormsService";
-import { SASHeaderTemplate } from "./SASHeaderTemplate";
+import { SASHeaderTemplateContext } from "./SASHeaderTemplateContext";
 import { SAS1view } from "./SAS1view";
 import { SAS2view } from "./SAS2view";
 import { SAS3view } from "./SAS3view";
@@ -14,6 +14,7 @@ export interface OwnProps {
 
 export interface OwnState {
   showThis: boolean;
+  headerText: string;
 }
 
 export class SASScriptsGridVersion extends React.Component<{}, OwnState> {
@@ -23,6 +24,7 @@ export class SASScriptsGridVersion extends React.Component<{}, OwnState> {
 
   state: OwnState = {
     showThis: true,
+    headerText: "Default Value",
   };
 
   private closePopovers = (): void => {
@@ -41,24 +43,70 @@ export class SASScriptsGridVersion extends React.Component<{}, OwnState> {
     event.preventDefault();
   };
 
+  private handleClick = (txt: string) => (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+    this.setState({
+      headerText: txt,
+    });
+  };
+
   render(): JSX.Element {
     return (
       <div className="sas_scripts_grid_bs">
-        <SASHeaderTemplate />
+        <SASHeaderTemplateContext headertext={this.state.headerText} />
         <aside>
           <ul className="nav nav-tabs">
             <li className="active">
-              <a href="#1" data-toggle="tab">
+              <a
+                href="#1"
+                data-toggle="tab"
+                onClick={this.handleClick("Plane Stuff")}
+              >
                 <span className="fa fa-plane"></span>
               </a>
             </li>
             <li>
-              <a href="#2" data-toggle="tab">
+              <a
+                href="#2"
+                data-toggle="tab"
+                onClick={this.handleClick("Bed Stuff")}
+              >
                 <span className="fa fa-bed"></span>
               </a>
             </li>
             <li>
-              <a href="#3" data-toggle="tab">
+              <a
+                href="#3"
+                data-toggle="tab"
+                onClick={this.handleClick("Square Stuff")}
+              >
+                <span className="fa fa-check-square"></span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#4"
+                data-toggle="tab"
+                onClick={this.handleClick("Check Stuff")}
+              >
+                <span className="fa fa-check-square"></span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#5"
+                data-toggle="tab"
+                onClick={this.handleClick("Some Other Stuff")}
+              >
+                <span className="fa fa-check-square"></span>
+              </a>
+            </li>
+            <li>
+              <a
+                href="#6"
+                data-toggle="tab"
+                onClick={this.handleClick("Blah blah Stuff")}
+              >
                 <span className="fa fa-check-square"></span>
               </a>
             </li>
@@ -68,6 +116,120 @@ export class SASScriptsGridVersion extends React.Component<{}, OwnState> {
           <SAS1view closePopovers={() => {}} />
           <SAS2view closePopovers={() => {}} />
           <SAS3view closePopovers={() => {}} />
+          <div className="tab-pane" id="4">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>{" "}
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+          </div>
+          <div className="tab-pane" id="5">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>{" "}
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+          </div>
+          <div className="tab-pane" id="6">
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>{" "}
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+            <p>
+              Lorem ipsum dolor sit amet, consectetur adipisicing elit. Natus
+              veritatis ducimus ipsum quidem praesentium. Excepturi illum
+              explicabo non consectetur unde? Nihil perferendis veniam eveniet
+              possimus fuga cumque illo necessitatibus quaerat.
+            </p>
+          </div>
         </article>
       </div>
     );
