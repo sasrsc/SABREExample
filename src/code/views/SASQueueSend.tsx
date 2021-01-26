@@ -63,7 +63,7 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
     this.setState({
       isLoading: true,
     });
-    console.log(`IsLoading=${this.state.isLoading}`);
+    //console.log(`IsLoading=${this.state.isLoading}`);
 
     fetch(file, {
       headers: {
@@ -84,13 +84,13 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
           isLoading: false,
         });
         console.log(this.state.queueList);
-        console.log(`IsLoading=${this.state.isLoading}`);
+        //console.log(`IsLoading=${this.state.isLoading}`);
       })
       .catch((err) => {
         console.log("Error reading json file " + err);
       });
 
-    let agentInfo: any;
+    //let agentInfo: any;
     // now get agents file
     let fileAgent: string = `${url}/assets/agents.json`;
     this.setState({
@@ -115,18 +115,27 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
         });
 
         // now get live agent info from the agents file
-        for (var i = 0; i < agentsList.length; i++) {
-          var x = agentsList[i];
-          console.log("Looping thru " + x.Sine + " checking for " + thisAgent);
-          if (x.Sine === thisAgent) {
-            agentInfo = agentsList[i];
-            console.log("Match on " + x.Sine + " for " + agentInfo.Agent);
-            this.setState({
-              agent: agentInfo,
-            });
-            break;
-          }
-        }
+        // for (var i = 0; i < agentsList.length; i++) {
+        //   var x = agentsList[i];
+        //   console.log("Looping thru " + x.Sine + " checking for " + thisAgent);
+        //   if (x.Sine === thisAgent) {
+        //     agentInfo = agentsList[i];
+        //     console.log("Match on " + x.Sine + " for " + agentInfo.Agent);
+        //     this.setState({
+        //       agent: agentInfo,
+        //     });
+        //     break;
+        //   }
+        // }
+
+        // let foundagent: any = agentsList.find((a) => a.Sine === thisAgent);
+        // console.log(foundagent);
+
+        let agentInfo: any = agentsList.find(({ Sine }) => Sine === thisAgent);
+        console.log(agentInfo);
+        this.setState({
+          agent: agentInfo,
+        });
       })
       .catch((err) => {
         console.log("Error reading json file " + err);
