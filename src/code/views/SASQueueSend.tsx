@@ -90,14 +90,13 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
         console.log("Error reading json file " + err);
       });
 
-    // now get agents file
     let agentInfo: any;
-
+    // now get agents file
     let fileAgent: string = `${url}/assets/agents.json`;
     this.setState({
       isLoading: true,
     });
-    console.log(`IsLoading=${this.state.isLoading}`);
+    //console.log(`IsLoading=${this.state.isLoading}`);
 
     fetch(fileAgent, {
       headers: {
@@ -122,40 +121,16 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
           if (x.Sine === thisAgent) {
             agentInfo = agentsList[i];
             console.log("Match on " + x.Sine + " for " + agentInfo.Agent);
-
             this.setState({
               agent: agentInfo,
             });
             break;
           }
         }
-
-        // console.log(
-        //   `From ${agentsList.length} we found ${agentInfo.length} agent `
-        // );
-        // console.log(`IsLoading=${this.state.isLoading}`);
       })
       .catch((err) => {
         console.log("Error reading json file " + err);
       });
-
-    // search for this agent in the list
-    //    let agentInfo: any = agentList.find((a) => a.Sine === thisAgent);
-    // let agentInfo: any;
-    // console.log(`*** Start Looping through agentList ***`);
-
-    // for (var i = 0; i < agentList.length; i++) {
-    //   var x = agentList[i];
-    //   console.log("Looping thru " + x.Sine + " checking for " + thisAgent);
-    //   if (x.Sine == thisAgent) {
-    //     console.log("Match on " + x.Sine + " " + x.Agent);
-    //     agentInfo = agentList[i];
-    //     break;
-    //   }
-    // }
-    // console.log(`*** Done Looping through agentList ***`);
-
-    console.log(`Active Agent Info from json ${this.state.agent}`);
   }
 
   private closePopovers() {
