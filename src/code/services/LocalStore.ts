@@ -20,7 +20,7 @@ const defaultState: Data = {
   messageAreaD: "Area D",
   messageAreaE: "Area E",
   messageAreaF: "Area F",
-  headerText: "",
+  headerText: "this is my header 2",
   testValue: "What is my value",
 };
 
@@ -47,6 +47,7 @@ export class LocalStore {
 
   getData(): Data {
     return this.store.getState();
+    //console.log(this.store);
   }
 
   getCurrentAreaMessage(): string {
@@ -60,5 +61,19 @@ export class LocalStore {
   setMessage(newVal: string) {
     const action = { type: "CHANGE_MSG", newVal: newVal };
     this.store.dispatch(action);
+  }
+
+  setHeaderTextMessage(newVal: string) {
+    const action = { type: "CHANGE_MSG", newVal: newVal };
+    this.store.dispatch(action);
+  }
+
+  getHeaderTextValue(v): string {
+    //const currentMessageName = "Hello my name is Jo";
+
+    // then decided to pass in the variable to update as a parameter (v)
+    const currentMessageName = v;
+    //return currentMessageName;
+    return this.store.getState()[currentMessageName];
   }
 }

@@ -12,6 +12,7 @@ import { MyPnr } from "./views/MyPnr";
 
 import SasScripts from "./views/SasScripts";
 import SASScriptsGrid from "./views/SASScriptsGrid";
+import SASApiTest from "./views/SASApiTest";
 import SASScriptsGrid2 from "./views/SASScriptsGrid2";
 import { NudgeConfig } from "sabre-ngv-xp/configs/NudgeConfig";
 import { NgvNudgeEntry } from "sabre-ngv-xp/interfaces/NgvNudgeEntry";
@@ -25,6 +26,7 @@ import { LocalStore } from "./services/LocalStore";
 import { registerService } from "./Context";
 import { SoapView } from "./views/SoapView";
 import { GetResView } from "./views/GetResView";
+import { ReduxView } from "./views/ReduxView";
 import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 import { RestView } from "./views/RestView_Use_for_Top_Launch";
 import { ExternalRestView } from "./views/ExternalRestView";
@@ -199,6 +201,12 @@ export class Main extends Module {
         "btn btn-secondary side-panel-button qa-assets-button",
         () => this.showPersist()
       ),
+
+      new RedAppSidePanelButton(
+        "Redux Store",
+        "btn btn-secondary side-panel-button qa-assets-button",
+        () => this.showRedux()
+      ),
     ]);
 
     xp.addConfig("redAppSidePanel", sidepanelConfig);
@@ -238,6 +246,10 @@ export class Main extends Module {
       "novice-buttons",
       new WidgetXPConfig(SASScriptsGrid2, 9999)
     );
+    extensionPointService.addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(SASApiTest, 5001)
+    );
 
     //used in the graphical pnr example
     //getService(ExtensionPointService).addConfig('novice-buttons', new WidgetXPConfig(StaticButton, -1000));
@@ -258,6 +270,26 @@ export class Main extends Module {
 
     getService(LayerService).showInModal(
       new BasicView({ model: new PersistModel(this.localStore) }),
+      addRemarkModalOptions,
+      { display: "areaView" }
+    );
+  }
+
+  private showRedux(): void {
+    let addRemarkModalOptions = {
+      title: "Redux Window",
+      actions: [
+        {
+          className: "app.common.views.Button",
+          caption: "OK",
+          actionName: "cancel",
+          type: "secondary",
+        },
+      ],
+    };
+
+    getService(LayerService).showInModal(
+      new ReduxView({ model: new PersistModel(this.localStore) }),
       addRemarkModalOptions,
       { display: "areaView" }
     );

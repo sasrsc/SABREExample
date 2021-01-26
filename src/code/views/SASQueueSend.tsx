@@ -4,6 +4,7 @@ import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 import { IFormsService } from "sabre-ngv-forms/services/IFormsService";
 import { LayerService } from "sabre-ngv-core/services/LayerService";
 const eventBus: AbstractModel = new AbstractModel();
+import { AgentProfileService } from "sabre-ngv-app/app/services/impl/AgentProfileService";
 import { SASFormModal } from "./SASFormModal";
 import { context } from "../Context";
 import { NativeSabreCommand } from "../services/NativeSabreCommand";
@@ -27,6 +28,8 @@ export interface MyState {
   queueList?: any;
   isLoading?: boolean;
   lastIndex?: number;
+  agents?: any;
+  agent?: any;
 }
 
 export class SASQueueSend extends React.Component<MyProps, MyState> {
@@ -40,14 +43,21 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
       command: "5test",
       soccer: "Man City",
       queueList: [],
+      agents: [],
       isLoading: false,
       lastIndex: 0,
       firstName: "",
       lastName: "",
+      agent: {},
     };
   }
 
   componentDidMount() {
+    // get active agent
+    const agentService: AgentProfileService = getService(AgentProfileService);
+    const thisAgent = agentService.getAgentId();
+    console.log(`Active Agent is "${thisAgent}"`);
+    // get the queue pref listing
     let url: string = context.getModule().getManifest().url;
     let file: string = `${url}/assets/queues.json`;
     this.setState({
@@ -79,6 +89,73 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
       .catch((err) => {
         console.log("Error reading json file " + err);
       });
+
+    // now get agents file
+    let agentInfo: any;
+
+    let fileAgent: string = `${url}/assets/agents.json`;
+    this.setState({
+      isLoading: true,
+    });
+    console.log(`IsLoading=${this.state.isLoading}`);
+
+    fetch(fileAgent, {
+      headers: {
+        "Content-Type": "application/json",
+        Accept: "application/json",
+      },
+    })
+      .then((response) => response.json())
+      .then((result) => {
+        const agentsList = result.map((item) => {
+          return item;
+        });
+        this.setState({
+          agents: agentsList,
+          isLoading: false,
+        });
+
+        // now get live agent info from the agents file
+        for (var i = 0; i < agentsList.length; i++) {
+          var x = agentsList[i];
+          console.log("Looping thru " + x.Sine + " checking for " + thisAgent);
+          if (x.Sine === thisAgent) {
+            agentInfo = agentsList[i];
+            console.log("Match on " + x.Sine + " for " + agentInfo.Agent);
+
+            this.setState({
+              agent: agentInfo,
+            });
+            break;
+          }
+        }
+
+        // console.log(
+        //   `From ${agentsList.length} we found ${agentInfo.length} agent `
+        // );
+        // console.log(`IsLoading=${this.state.isLoading}`);
+      })
+      .catch((err) => {
+        console.log("Error reading json file " + err);
+      });
+
+    // search for this agent in the list
+    //    let agentInfo: any = agentList.find((a) => a.Sine === thisAgent);
+    // let agentInfo: any;
+    // console.log(`*** Start Looping through agentList ***`);
+
+    // for (var i = 0; i < agentList.length; i++) {
+    //   var x = agentList[i];
+    //   console.log("Looping thru " + x.Sine + " checking for " + thisAgent);
+    //   if (x.Sine == thisAgent) {
+    //     console.log("Match on " + x.Sine + " " + x.Agent);
+    //     agentInfo = agentList[i];
+    //     break;
+    //   }
+    // }
+    // console.log(`*** Done Looping through agentList ***`);
+
+    console.log(`Active Agent Info from json ${this.state.agent}`);
   }
 
   private closePopovers() {
@@ -190,7 +267,7 @@ export class SASQueueSend extends React.Component<MyProps, MyState> {
                   />
                   <label
                     className="form-check-label"
-                    htmlFor="flexCheckDefault"
+                    htmlFor={"IsSelected" + q.queueId}
                   >
                     {q.PrefNum} {q.Desc}
                   </label>

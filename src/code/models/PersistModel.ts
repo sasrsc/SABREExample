@@ -19,7 +19,9 @@ export class PersistModel extends AbstractModel {
       "Store state during initialization:",
       localStore.store.getState()
     );
-    this.text = localStore.getCurrentAreaMessage();
+    //this.text = localStore.getCurrentAreaMessage();
+    //this.text = localStore.getHeaderTextValue("headerText");
+    this.text = localStore.store.getState()["headerText"];
   }
 
   getText(): string {
@@ -29,5 +31,10 @@ export class PersistModel extends AbstractModel {
   setText(text: string): void {
     this.text = text;
     this.localStore.setMessage(text);
+  }
+
+  setHeaderText(text: string): void {
+    this.text = text;
+    this.localStore.setHeaderTextMessage(text);
   }
 }

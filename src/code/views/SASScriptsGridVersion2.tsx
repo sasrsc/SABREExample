@@ -8,6 +8,7 @@ import { SASInfoQC } from "./SASInfoQC";
 import { SASQueueSend } from "./SASQueueSend";
 import { SASAppDispatcher } from "./SASAppDispatcherCall";
 import { SASFormModal } from "./SASFormModal";
+import { SASRedux } from "./SASRedux";
 import {
   Alert,
   Panel,
@@ -177,6 +178,16 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
                 <span className="fa fa-hotel"></span>
               </a>
             </li>
+
+            <li>
+              <a
+                href="#redux"
+                onClick={this.handleClick("Redux Communication")}
+                data-toggle="tab"
+              >
+                <span className="fa fa-map"></span>
+              </a>
+            </li>
           </ul>
         </aside>
         <article>
@@ -306,6 +317,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           <SASQueueSend closePopovers={() => {}} />
           <SASAppDispatcher closePopovers={() => {}} />
           <SASHotelHKtoGK closePopovers={() => {}} />
+          <SASRedux />
         </article>
         {/* <SASFooterTemplate /> */}
       </div>

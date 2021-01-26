@@ -12,4 +12,9 @@ export class LocalStoreHelperService extends AbstractService {
 
     return `messageArea${currentArea}`;
   }
+
+  getHeaderText(): string {
+    console.log(`trying to process local store helper`);
+    return `Some value`;
+  }
 }
