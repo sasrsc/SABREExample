@@ -36,6 +36,7 @@ export interface OwnState {
   firstName: string;
   lastName: string;
   headerText: string;
+  color: string;
 }
 
 export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
@@ -47,6 +48,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
       firstName: "Richard",
       lastName: "Clowes",
       headerText: "Air Info",
+      color: "blue",
     };
 
     this.handleClick = this.handleClick.bind(this);
@@ -86,6 +88,12 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
       [field]: value,
     });
   }
+
+  private onRadioChange = (e) => {
+    this.setState({
+      color: e.target.value,
+    });
+  };
 
   private submitHandler = async (
     event: React.FormEvent<HTMLFormElement>
@@ -303,6 +311,35 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
                     value={this.state.lastName}
                   />
                 </div>
+
+                <div className="col-md-3">
+                  <label>
+                    <input
+                      type="radio"
+                      className="form-control"
+                      name="color"
+                      checked={this.state.color === "red"}
+                      onChange={this.changeHandler.bind(this)}
+                      value="red"
+                    />
+                    <span>Red</span>
+                  </label>
+                </div>
+
+                <div className="col-md-3">
+                  <label>
+                    <input
+                      type="radio"
+                      className="form-control"
+                      name="color"
+                      checked={this.state.color === "blue"}
+                      onChange={this.changeHandler.bind(this)}
+                      value="blue"
+                    />
+                    <span>Blue</span>
+                  </label>
+                </div>
+
                 <div className="col-md-3">
                   <Button type="submit">Submit</Button>
                 </div>
