@@ -13,6 +13,7 @@ import { MyPnr } from "./views/MyPnr";
 import SasScripts from "./views/SasScripts";
 import SASScriptsGrid from "./views/SASScriptsGrid";
 import SASApiTest from "./views/SASApiTest";
+import PassportVisaIcon from "./views/PassportVisaIcon";
 import SASScriptsGrid2 from "./views/SASScriptsGrid2";
 import { NudgeConfig } from "sabre-ngv-xp/configs/NudgeConfig";
 import { NgvNudgeEntry } from "sabre-ngv-xp/interfaces/NgvNudgeEntry";
@@ -250,9 +251,10 @@ export class Main extends Module {
       "novice-buttons",
       new WidgetXPConfig(SASApiTest, 5001)
     );
-
-    //used in the graphical pnr example
-    //getService(ExtensionPointService).addConfig('novice-buttons', new WidgetXPConfig(StaticButton, -1000));
+    extensionPointService.addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(PassportVisaIcon, 5002)
+    );
   }
 
   private showPersist(): void {

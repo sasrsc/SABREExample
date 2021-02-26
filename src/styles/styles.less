@@ -1,5 +1,27 @@
 @import "../../core/styles/core-styles";
 
+header {
+  grid-area: header;
+  background-color: #eaf6ff;
+  padding: 10px;
+  display: flex;
+  justify-content: space-between;
+
+  h3 {
+    margin: 0px;
+  }
+  span {
+    //display: block;
+    vertical-align: top;
+  }
+
+  img {
+    // display: inline-block;
+    height: 31px;
+    width: 75px;
+  }
+}
+
 .sas_scripts_component {
   .nav-tabs > li.active > a,
   .nav-tabs > li.active > a:hover,
@@ -202,31 +224,31 @@
 
 .sas_scripts_grid {
   display: grid;
-  grid-template-rows: 50px 350px;
+  // grid-template-rows: 50px 350px;
   grid-template-areas:
     "header header"
     "sidebar content";
-  grid-template-columns: 1fr 11fr;
-  grid-gap: 0px;
+  grid-template-columns: 1fr 15fr;
+  //grid-gap: 0px;
   overflow: hidden;
 
   header {
     grid-area: header;
     background-color: #eaf6ff;
     padding: 10px;
+    display: flex;
+    justify-content: space-between;
 
     h3 {
-      float: left;
       margin: 0px;
-      padding-left: 20px;
     }
     span {
-      float: right;
-      margin: 0px;
-      padding: 0px;
+      //display: block;
+      vertical-align: top;
     }
+
     img {
-      float: left;
+      // display: inline-block;
       height: 31px;
       width: 75px;
     }
@@ -250,6 +272,8 @@
         margin-right: 0;
         border: 0;
         border-radius: 0;
+        padding: 10px 25px;
+        text-align: center;
 
         &:hover {
           background-color: #0c97fb;
@@ -397,5 +421,11 @@
     .active {
       display: block;
     }
+  }
+}
+
+.com-sabre-example-redapp-web-module {
+  .form-row {
+    margin-bottom: 10px;
   }
 }
