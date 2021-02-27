@@ -29,7 +29,7 @@ export class SASHeaderTemplateContext extends React.Component<
 
   render(): JSX.Element {
     return (
-      <header>
+      <header className="sas_header_popover">
         <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
         <h3>{this.props.headertext}</h3>
         <span onClick={this.closePopovers}>

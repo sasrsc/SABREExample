@@ -1,24 +1,46 @@
 @import "../../core/styles/core-styles";
 
-header {
-  grid-area: header;
-  background-color: #eaf6ff;
-  padding: 10px;
+.com-sabre-example-redapp-web-module {
+  * {
+    margin: 10px;
+  }
+}
+
+.sas-bottom-right {
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
+}
 
-  h3 {
-    margin: 0px;
-  }
-  span {
-    //display: block;
-    vertical-align: top;
-  }
+.sas_header_popover {
+  header {
+    grid-area: header;
+    background-color: #eaf6ff;
+    padding: 10px;
+    display: flex;
+    justify-content: space-between;
 
-  img {
-    // display: inline-block;
-    height: 31px;
-    width: 75px;
+    h3 {
+      margin: 0px;
+    }
+    span {
+      //display: block;
+      vertical-align: top;
+    }
+
+    img {
+      // display: inline-block;
+      height: 31px;
+      width: 75px;
+    }
+  }
+}
+
+.sas_passport_grid {
+  .row {
+    margin-bottom: 5px;
+  }
+  Button {
+    margin: 20px;
   }
 }
 

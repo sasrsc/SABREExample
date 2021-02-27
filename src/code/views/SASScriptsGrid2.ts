@@ -6,10 +6,10 @@ import StatelessComponent from "sabre-ngv-UIComponents/baseComponent/components/
 import { AbstractViewOptions } from "sabre-ngv-app/app/AbstractViewOptions";
 import { SASScriptsGridVersion2 } from "./SASScriptsGridVersion2";
 
-@CssClass("com-sabre-example-redapp-web-module-forms-service btn btn-default")
+@CssClass("com-sabre-example-redapp-web-module btn btn-default")
 @Initial({
   caption:
-    '<i class="fa fa-globe-americas"></i> <span class="hidden-xs dn-x-hidden-0-8">SAS Scripts (Grid) with separate components</span>',
+    '<i class="fa fa-globe-americas"></i> <span class="hidden-xs dn-x-hidden-0-8">SAS</span>',
   type: "default",
 })
 export default class SASScriptsGrid2 extends AbstractBootstrapPopoverButton {

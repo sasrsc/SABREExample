@@ -9,6 +9,7 @@ import { SASQueueSend } from "./SASQueueSend";
 import { SASAppDispatcher } from "./SASAppDispatcherCall";
 import { SASFormModal } from "./SASFormModal";
 import { SASRedux } from "./SASRedux";
+import { SASPassport } from "./SASPassport";
 import {
   Alert,
   Panel,
@@ -58,13 +59,6 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
     IFormsService
   );
 
-  // state: OwnState = {
-  //   showThis: true,
-  //   firstName: "Richard",
-  //   lastName: "Clowes",
-  //   headerText: "Passed from Gridv2",
-  // };
-
   private closePopovers = (): void => {
     eventBus.triggerOnEventBus("hide-popovers", "novice-menu");
   };
@@ -107,12 +101,10 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
 
   private handleClick = (txt: string) => (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
-    //console.log("The link was clicked.");
-    //console.log(e);
-
     this.setState({
       headerText: txt,
     });
+    console.log(`**** Opening ${txt} section ****`);
   };
 
   render(): JSX.Element {
@@ -194,6 +186,16 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
                 data-toggle="tab"
               >
                 <span className="fa fa-map"></span>
+              </a>
+            </li>
+
+            <li>
+              <a
+                href="#passport"
+                onClick={this.handleClick("Passport & Visa Documentation")}
+                data-toggle="tab"
+              >
+                <span className="fa fa-passport"></span>
               </a>
             </li>
           </ul>
@@ -355,6 +357,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           <SASAppDispatcher closePopovers={() => {}} />
           <SASHotelHKtoGK closePopovers={() => {}} />
           <SASRedux />
+          <SASPassport />
         </article>
         {/* <SASFooterTemplate /> */}
       </div>

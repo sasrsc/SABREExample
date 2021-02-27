@@ -7,10 +7,16 @@
   },
   "contributors": [],
   "private": true,
-  "license": "LicenseRef-LICENSE",
+  "license": "SEE LICENSE IN LICENSE.txt",
   "dependencies": {
     "@types/react-bootstrap": "^0.32.1",
-    "react-bootstrap": "^0.32.1"
+    "react-bootstrap": "^0.32.1",
+    "sabre-ngv-app": "^1.0.0",
+    "sabre-ngv-core": "^1.0.0",
+    "sabre-ngv-commsg": "^1.0.0",
+    "sabre-ngv-forms": "^1.0.0",
+    "sabre-ngv-pos-cdm": "^1.0.0",
+    "sabre-ngv-extensionPoints": "^1.0.0"
   },
   "devDependencies": {},
   "optionalDependencies": {},
@@ -18,17 +24,18 @@
     "buildDependencies": {
       "sabre-ngv-app": "*",
       "sabre-ngv-core": "*",
-      "sabre-ngv-xp": "*",
-      "sabre-ngv-reservation": "*",
-      "sabre-ngv-redAppSidePanel": "*",
-      "sabre-ngv-customCommand": "*",
+      "sabre-ngv-commsg": "*",
       "sabre-ngv-communication": "*",
+      "sabre-ngv-customCommand": "*",
       "sabre-ngv-forms": "*",
       "sabre-ngv-UIComponents": "*",
+      "sabre-ngv-xp": "*",
+      "sabre-ngv-redAppSidePanel": "*",
       "sabre-ngv-pos-cdm": "*",
-      "sabre-ngv-commsg": "*"
+      "sabre-ngv-extensionPoints": "*",
+      "sabre-ngv-reservation": "*"
     },
-    "concierge_version_min": "5.7.0",
+    "concierge_version_min": "5.9.2",
     "runtimeDependencies": {},
     "testDependencies": {}
   }

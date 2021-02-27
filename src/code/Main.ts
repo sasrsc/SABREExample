@@ -1,6 +1,9 @@
 import { Module } from "sabre-ngv-core/modules/Module";
 import { DtoService } from "sabre-ngv-app/app/services/impl/DtoService";
-import { getService, context } from "./Context";
+import { registerService, getService, context } from "./Context";
+
+import { CommFoundHelper } from "./services/CommFoundHelper";
+
 import { ExtensionPointService } from "sabre-ngv-xp/services/ExtensionPointService";
 import { RedAppSidePanelConfig } from "sabre-ngv-xp/configs/RedAppSidePanelConfig";
 import { WidgetXPConfig } from "sabre-ngv-xp/configs/WidgetXPConfig";
@@ -10,21 +13,26 @@ import { LayerService } from "sabre-ngv-core/services/LayerService";
 import { SasFormView } from "./views/SasFormView";
 import { MyPnr } from "./views/MyPnr";
 
+import CmdHelperButton from "./views/cmdHelper/custom/CmdHelperButton";
+import CommFoundButton from "./views/cmdHelper/gdsData/CommFoundButton";
+
+import { ShellPnrComponent } from "./views/customWF/ShellPnrComponent";
+import { AfterSellPopover } from "./views/customWF/AfterSellPopover";
+import { BeforeEndHandler } from "./services/xtpoints/BeforeEndHandler";
 import SasScripts from "./views/SasScripts";
 import SASScriptsGrid from "./views/SASScriptsGrid";
 import SASApiTest from "./views/SASApiTest";
-import PassportVisaIcon from "./views/PassportVisaIcon";
 import SASScriptsGrid2 from "./views/SASScriptsGrid2";
 import { NudgeConfig } from "sabre-ngv-xp/configs/NudgeConfig";
 import { NgvNudgeEntry } from "sabre-ngv-xp/interfaces/NgvNudgeEntry";
 import { NudgeEntryView } from "./views/NudgeEntryView";
+import { NudgeView } from "./views/popUps/NudgeView";
 import { MyHelloModalWindow } from "./views/MyHelloModalWindow";
 import { BasicModel } from "./models/BasicModel";
 import { PersistModel } from "./models/PersistModel";
 import { SampleCustomCommandHandler } from "./services/SampleCustomCommandHandler";
 import { NativeSabreCommand } from "./services/NativeSabreCommand";
 import { LocalStore } from "./services/LocalStore";
-import { registerService } from "./Context";
 import { SoapView } from "./views/SoapView";
 import { GetResView } from "./views/GetResView";
 import { ReduxView } from "./views/ReduxView";
@@ -54,7 +62,8 @@ export class Main extends Module {
 
   init(): void {
     super.init();
-
+    // module initialization
+    this.setupNudge();
     // kb rc testing gitlab
 
     const xp = getService(ExtensionPointService);
@@ -130,7 +139,14 @@ export class Main extends Module {
 
     // used for the right side panel
 
-    const sidepanelConfig = new RedAppSidePanelConfig([
+    const sidePanelConfig = new RedAppSidePanelConfig([
+      new RedAppSidePanelButton("CREATE A PNR", "side-panel-button", () =>
+        this.showPNRShellPopup()
+      ),
+      new RedAppSidePanelButton("AFTER SELL", "side-panel-button", () =>
+        this.showAfterSellPopup()
+      ),
+
       new RedAppSidePanelButton("Show hello modal", "btn btn-secondary", () => {
         this.showMyHelloModalWindow();
       }),
@@ -210,18 +226,34 @@ export class Main extends Module {
       ),
     ]);
 
-    xp.addConfig("redAppSidePanel", sidepanelConfig);
+    //xp.addConfig("redAppSidePanel", sidePanelConfig); this appears to be the same as 243-246
     //var reservation = {};
 
     registerService(SampleCustomCommandHandler);
     registerService(NativeSabreCommand);
     registerService(PRCustomCommandHandler);
     registerService(LocalStoreHelperService);
+    //services to back the Module operation
+    registerService(CommFoundHelper);
+    registerService(BeforeEndHandler);
 
     this.localStore = new LocalStore();
 
     getService(PRCustomCommandHandler).setLocalStore(this.localStore);
+    getService(ExtensionPointService).addConfig(
+      "redAppSidePanel",
+      sidePanelConfig
+    );
 
+    //command helper toolbar contribution
+    getService(ExtensionPointService).addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(CommFoundButton, -1000)
+    );
+    getService(ExtensionPointService).addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(CmdHelperButton, -1000)
+    );
     const button: StaticButtonPersist = new StaticButtonPersist(
       this.localStore.store
     );
@@ -245,15 +277,11 @@ export class Main extends Module {
     );
     extensionPointService.addConfig(
       "novice-buttons",
-      new WidgetXPConfig(SASScriptsGrid2, 9999)
+      new WidgetXPConfig(SASScriptsGrid2, 1000)
     );
     extensionPointService.addConfig(
       "novice-buttons",
       new WidgetXPConfig(SASApiTest, 5001)
-    );
-    extensionPointService.addConfig(
-      "novice-buttons",
-      new WidgetXPConfig(PassportVisaIcon, 5002)
     );
   }
 
@@ -772,6 +800,64 @@ export class Main extends Module {
       {
         display: "areaView",
       }
+    );
+  }
+
+  private showPNRShellPopup(): void {
+    getService(LayerService).showOnLayer(ShellPnrComponent, {
+      display: "areaView",
+      position: 33,
+    });
+  }
+  private showAfterSellPopup(): void {
+    getService(LayerService).showOnLayer(AfterSellPopover, {
+      display: "areaView",
+      position: 33,
+    });
+  }
+
+  private setupNudge(): void {
+    let xp: ExtensionPointService = getService(ExtensionPointService);
+    xp.addConfig(
+      "nudge",
+      new NudgeConfig(
+        "INFO",
+        "NUDGE EXTENSION AVAILABLE",
+        [
+          {
+            id: "nudgeAction01",
+            label: "more info",
+            action: (entries: NgvNudgeEntry[]) => {
+              getService(LayerService).showInModal(
+                new NudgeView({
+                  model: {
+                    entries: { entries },
+                    entriesJSON: JSON.stringify(entries),
+                  },
+                }),
+                { title: "Data available for the Nudge Event" },
+                { display: "areaView" }
+              );
+            },
+          },
+        ],
+        this.nudgeFilter
+      )
+    );
+  }
+  nudgeFilter(entries: NgvNudgeEntry[]): boolean {
+    let availableLocations = [
+      "AIR_AVAILABILITY",
+      "SHOPPING",
+      "HOTEL",
+      "CAR",
+      "SELL",
+      "PRICING",
+    ];
+    return (
+      entries.filter((entry, idx, array) => {
+        return availableLocations.indexOf(entry.location) >= 0;
+      }).length > 0
     );
   }
 }
