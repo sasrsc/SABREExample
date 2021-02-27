@@ -1,1 +1,0 @@
-/* com-sabre-example-redapp-web-module */

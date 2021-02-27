@@ -4,7 +4,6 @@ import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 import { NativeSabreCommand } from "../services/NativeSabreCommand";
 import { IReservationService } from "sabre-ngv-reservation/services/IReservationService";
 import { CommFoundHelper } from "../services/CommFoundHelper";
-
 import {
   CommandMessageReservationRs,
   ReservationRs,
@@ -88,6 +87,8 @@ export class SASPassport extends React.Component<{}, OwnState> {
     this.closePopovers = this.closePopovers.bind(this);
     this.getRemarks = this.getRemarks.bind(this);
   }
+
+  cfHelper: CommFoundHelper = getService(CommFoundHelper);
 
   componentDidMount() {
     console.log("Searching for P¥ ....");
@@ -296,6 +297,23 @@ export class SASPassport extends React.Component<{}, OwnState> {
 </RemarkInfo>
 </AddRemarkRQ>`;
 
+        /*
+
+          "Remark" :
+        '<Remark Type="General">'
+		    +'<Text>'
+        +'{Text}'
+		    +'</Text>'
+        +'</Remark>',
+
+        <AddRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.0">
+<RemarkInfo>
+<Remark Type="General">
+<Text>TEST GENERAL REMARK</Text>
+</Remark>
+</RemarkInfo>
+</AddRemarkRQ> */
+
         getService(CommFoundHelper)
           .sendSWSRequest({
             action: "AddRemarkLLSRQ",
@@ -313,6 +331,59 @@ export class SASPassport extends React.Component<{}, OwnState> {
         console.log("P¥ entry", pdocentry);
       }
     });
+
+    var sendRmks = this.cfHelper.getXmlPayload("AddRemarkLLSRQ", {
+      Remark: () => {
+        let strRmk = "";
+
+        for (let i = 0; i < 10; i++) {
+          strRmk = strRmk.concat(
+            this.cfHelper.getXmlPayload("Remark", {
+              Text: "RMKRC" + i.toString(),
+            })
+          );
+        }
+        return strRmk;
+      },
+    });
+
+    var sendAlphaRmks = this.cfHelper.getXmlPayload("AddRemarkLLSRQ", {
+      Remark: () => {
+        let strRmk = "";
+        let myRemarks = [
+          { Code: "A", Text: "My A Text" },
+          { Code: "H", Text: "My H text" },
+        ];
+
+        for (let i = 0; i < myRemarks.length; i++) {
+          strRmk = strRmk.concat(
+            this.cfHelper.getXmlPayload("RemarkAlpha", {
+              Code: myRemarks[i].Code,
+              Text: myRemarks[i].Text,
+            })
+          );
+        }
+        return strRmk;
+      },
+    });
+
+    console.log(sendRmks);
+
+    // sendRmks = `<AddRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.0"><RemarkInfo><Remark Type="General"><Text>RMKRC0</Text></Remark><Remark Type="General"><Text>RMKRC1</Text></Remark><Remark Type="General"><Text>RMKRC2</Text></Remark><Remark Type="General"><Text>RMKRC3</Text></Remark><Remark Type="General"><Text>RMKRC4</Text></Remark><Remark Type="General"><Text>RMKRC5</Text></Remark><Remark Type="General"><Text>RMKRC6</Text></Remark><Remark Type="General"><Text>RMKRC7</Text></Remark><Remark Type="General"><Text>RMKRC8</Text></Remark><Remark Type="General"><Text>RMKRC9</Text></Remark></RemarkInfo></AddRemarkRQ>`;
+    // console.log(sendRmks);
+
+    getService(CommFoundHelper)
+      .sendSWSRequest({
+        action: "AddRemarkLLSRQ",
+        payload: sendAlphaRmks,
+        authTokenType: "SESSION",
+      })
+      .then((res) => {
+        this.setState({
+          response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
+        });
+      });
+    console.log(this.state.response);
   };
 
   private displayP() {
