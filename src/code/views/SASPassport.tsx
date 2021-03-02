@@ -3,6 +3,7 @@ import { getService } from "../Context";
 import { AbstractModel } from "sabre-ngv-app/app/AbstractModel";
 import { NativeSabreCommand } from "../services/NativeSabreCommand";
 import { IReservationService } from "sabre-ngv-reservation/services/IReservationService";
+import { IAreaService } from "sabre-ngv-app/app/services/impl/IAreaService";
 import { CommFoundHelper } from "../services/CommFoundHelper";
 import {
   CommandMessageReservationRs,
@@ -25,9 +26,9 @@ export interface OwnProps {
   closePopovers: () => void;
 }
 
-export interface PassportVisaItem {
+export class PassportVisaItem {
   Id: number;
-  Existing: boolean;
+  isExisting: boolean;
   Citizenship: string;
   CountryDestination: string;
   NeedPassport: string;
@@ -47,7 +48,7 @@ export interface OwnState {
   headerText: string;
   errorMessage: string;
   isError: boolean;
-
+  deleteList: any;
   response: any;
   PassportVisaDocList: Array<PassportVisaItem>;
 }
@@ -56,32 +57,19 @@ export class SASPassport extends React.Component<{}, OwnState> {
   constructor(props = {}) {
     super(props);
     this.state = {
-      PassportVisaDocList: [
-        {
-          Id: 1000,
-          Existing: false,
-          Citizenship: "",
-          CountryDestination: "",
-          NeedPassport: "",
-          NeedVisa: "",
-          HavePassport: "",
-          HaveVisa: "",
-          PrimaryDocument: "",
-          PassportExpSoon: "",
-          DocumentType: "",
-          isChange: true,
-        },
-      ],
+      PassportVisaDocList: [],
       headerText: "Add Passport/Visa Documentation",
       lastPassVisaDocIndex: 1001,
       remarksList: [],
       premarksList: [],
+      deleteList: [],
       errorMessage: "",
       response: "",
       isError: false,
     };
 
     this.handleSubmit = this.handleSubmit.bind(this);
+    this.checkMultipleCountries = this.checkMultipleCountries.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.handleChangeSelect = this.handleChangeSelect.bind(this);
     this.closePopovers = this.closePopovers.bind(this);
@@ -101,23 +89,56 @@ export class SASPassport extends React.Component<{}, OwnState> {
     });
   }
 
+  public getSabreString(obj) {
+    return (
+      obj.CountryDestination +
+      "/NA-" +
+      obj.Citizenship +
+      "/P-" +
+      obj.NeedPassport +
+      "/V-" +
+      obj.NeedVisa +
+      "/PS-" +
+      obj.HavePassport +
+      "/VS-" +
+      obj.HaveVisa +
+      "/PD-" +
+      obj.PrimaryDocument +
+      "/EXP-" +
+      obj.PassportExpSoon +
+      "/D-" +
+      obj.DocumentType
+    );
+  }
   private closePopovers = (): void => {
     eventBus.triggerOnEventBus("hide-popovers", "novice-menu");
   };
 
   private addDocument() {
+    let lastitem: any;
+    if (this.state.PassportVisaDocList.length > 0) {
+      lastitem = this.state.PassportVisaDocList[
+        this.state.PassportVisaDocList.length - 1
+      ];
+    } else {
+      lastitem = {
+        Citizenship: "",
+        HavePassport: "",
+        PrimaryDocument: "",
+        PassportExpSoon: "",
+        DocumentType: "",
+      };
+    }
     let next = this.state.lastPassVisaDocIndex;
     //get the values from the last item in the array to pre populate the new item
-    let lastitem = this.state.PassportVisaDocList[
-      this.state.PassportVisaDocList.length - 1
-    ];
+
     //add another row to our array
     this.setState((prevState) => ({
       PassportVisaDocList: [
         ...prevState.PassportVisaDocList,
         {
           Id: next + 1,
-          Existing: false,
+          isExisting: false,
           Citizenship: lastitem.Citizenship,
           CountryDestination: "",
           NeedPassport: "",
@@ -142,7 +163,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
   ) => {
     const name = e.target.name;
     const value = e.target.value.toUpperCase();
-    console.log(`${name} has changed to ${value}`);
+    //console.log(`${name} has changed to ${value}`);
 
     const doc = this.state.PassportVisaDocList.map((i) =>
       i.Id == id ? { ...i, [name]: value, isChange: true } : i
@@ -158,9 +179,9 @@ export class SASPassport extends React.Component<{}, OwnState> {
   ) => {
     const value: any = event.currentTarget.value;
     const name: any = event.currentTarget.name;
-    console.log(`Changing ${name} to ${value}`);
+    //console.log(`Changing ${name} to ${value}`);
     const doc = this.state.PassportVisaDocList.map((i) =>
-      i.Id == id ? { ...i, [name]: value } : i
+      i.Id == id ? { ...i, [name]: value, isChange: true } : i
     );
 
     this.setState({
@@ -172,43 +193,72 @@ export class SASPassport extends React.Component<{}, OwnState> {
     event: React.MouseEvent<HTMLInputElement>
   ) => {
     let doclist = this.state.PassportVisaDocList;
-    //    console.log(`${value}, ${name}, ${id}`);
+    console.log(`**** Delete line ${id} ****`);
     let itemtodelete: number = null;
+    let isExisting: boolean;
     doclist.forEach((i, index) => {
       if (i.Id == id) {
         itemtodelete = index;
+        isExisting = i.isExisting;
       }
     });
-
+    // remove from our temp list
     doclist.splice(itemtodelete, 1);
 
+    // update state to reflect the item being removed
     this.setState({
       PassportVisaDocList: doclist,
     });
-    this.checkMultipleCountries();
+
+    // are there still duplicate countries?
+    let isError = this.checkMultipleCountries();
+
+    console.log(`Existing row(${id})? = ${isExisting}`);
+
+    if (isExisting === true) {
+      // create xml to delete the item from the face of the pnr if it was in there in the beginning ...
+      var deleteRmk = this.cfHelper.getXmlPayload("DeleteRemark", {
+        LineNumber: '"' + id + '"',
+      });
+      console.log(deleteRmk);
+
+      // delete the remark in the pnr
+      getService(CommFoundHelper)
+        .sendSWSRequest({
+          action: "ModifyRemarkLLSRQ",
+          payload: deleteRmk,
+          authTokenType: "SESSION",
+        })
+        .then((res) => {
+          this.setState({
+            response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
+          });
+        });
+    }
   };
 
-  private checkMultipleCountries() {
+  public checkMultipleCountries = async () => {
     const localcopy = this.state.PassportVisaDocList;
     let duplicates = "";
     let isError: boolean = false;
+    console.log(`***searching for duplicates****`);
 
     this.state.PassportVisaDocList.forEach((i) => {
-      /* loop through all the items in the list....
-                          does the same destination exist already?
-              */
-
+      /* loop through all the items in the existing list....
+         how many times does the same destination exist already? it should appear only once "as itself"
+      */
+      // temp var to store the country we are searching for...
       let countrydestination = i.CountryDestination.trim();
-
+      // search the array to see how many times it exists
       const sameDestination: any = localcopy.filter(function (i) {
         return i.CountryDestination === countrydestination;
       });
       console.log(
         `${sameDestination.length} entries found for ${countrydestination}`
       );
-
+      // if it appears more than once (itself) then alert
       if (sameDestination.length > 1) {
-        duplicates = duplicates += countrydestination;
+        duplicates = duplicates.concat(", ", countrydestination);
       }
     });
 
@@ -227,97 +277,50 @@ export class SASPassport extends React.Component<{}, OwnState> {
         isError: isError,
       });
     }
+
     return isError;
-  }
+  };
 
   private handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
     event.preventDefault();
-    console.log("This is what happens when I click on the PassportVisa button");
-    this.state.PassportVisaDocList.forEach((i) => {
-      /* loop through all the items in the list....
-            NEW LINE?
-            is it a valid line? !!!!this should be controlled by form validation!!!!!
-            does the same destination exist already?
-            if not add
-            EXISTING LINE?
-            is it a valid line? !!!!this should be controlled by form validation!!!!!
-            has it changed?
-        */
-      let countrydestination = i.CountryDestination.trim();
-      let qcFailed = this.checkMultipleCountries();
-      console.log(qcFailed);
+    console.log("***Submit PassportVisa Form***");
+    const tempList: Array<any> = [...this.state.PassportVisaDocList];
+    let sendRmks: any = [];
+    // now decide what to do ...
+    // any duplicates?
+    var isError = await this.checkMultipleCountries();
+    console.log(isError);
 
-      if (qcFailed) {
-        console.log(` **** STOP ***** `);
-      } else {
-        let citizenship = i.Citizenship.trim();
-        let havePassport = i.HavePassport;
-        let haveVisa = i.HaveVisa;
-        let needPassport = i.NeedPassport;
-        let needVisa = i.NeedVisa;
-        let passportExp = i.PassportExpSoon;
-        let primaryDocument = i.PrimaryDocument;
-        let documentType = i.DocumentType;
-        let existing = i.Existing;
-        let beginning: string = "";
-        if (existing === true) {
-          beginning = "5" + i.Id + "¤P¥";
-        } else {
-          beginning = "5P¥";
-        }
-        let pdocentry: string =
-          beginning +
-          citizenship +
-          "/NA-" +
-          countrydestination +
-          "/P-" +
-          needPassport +
-          "/V-" +
-          needVisa +
-          "/PS-" +
-          havePassport +
-          "/VS-" +
-          haveVisa +
-          "/PD-" +
-          primaryDocument +
-          "/EXP-" +
-          passportExp +
-          "/D-" +
-          documentType;
-
-        getService(NativeSabreCommand).handleSubmit(pdocentry);
-
-        let createRmk = `<AddRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.1">
-<RemarkInfo>
-<Remark Code="P" Type="Alpha-Coded">
-<Text>COMMAND ADDED VIA SOAP</Text>
-</Remark>
-</RemarkInfo>
-</AddRemarkRQ>`;
-
-        /*
-
-          "Remark" :
-        '<Remark Type="General">'
-		    +'<Text>'
-        +'{Text}'
-		    +'</Text>'
-        +'</Remark>',
-
-        <AddRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.0">
-<RemarkInfo>
-<Remark Type="General">
-<Text>TEST GENERAL REMARK</Text>
-</Remark>
-</RemarkInfo>
-</AddRemarkRQ> */
-
+    if (isError === true) {
+      console.log(` **** STOP ***** `);
+    } else {
+      console.log(` **** OK ***** `);
+      // now break up the entries into new ones and modify ones...
+      const newentries: any = tempList.filter(function (i) {
+        return i.isExisting === false;
+      });
+      if (newentries.length > 0) {
+        console.log(`There are ${newentries.length} that must be added`);
+        sendRmks = this.cfHelper.getXmlPayload("AddRemarkLLSRQ", {
+          Remark: () => {
+            let strRmk = "";
+            for (let i = 0; i < newentries.length; i++) {
+              strRmk = strRmk.concat(
+                this.cfHelper.getXmlPayload("RemarkAlpha", {
+                  Code: "P",
+                  Text: this.getSabreString(newentries[i]),
+                })
+              );
+            }
+            return strRmk;
+          },
+        });
         getService(CommFoundHelper)
           .sendSWSRequest({
             action: "AddRemarkLLSRQ",
-            payload: createRmk,
+            payload: sendRmks,
             authTokenType: "SESSION",
           })
           .then((res) => {
@@ -326,64 +329,78 @@ export class SASPassport extends React.Component<{}, OwnState> {
                 ? JSON.stringify(res, null, 2)
                 : res.value,
             });
+            getService(CommFoundHelper).refreshTipSummary();
+
+            if (res.errorCode !== undefined && res.errorCode !== null) {
+              getService(IAreaService).showBanner(
+                "Error",
+                "Failed: ".concat(res.errorCode),
+                "Passport & Visa Documentation"
+              );
+            } else {
+              getService(IAreaService).showBanner(
+                "Success",
+                "Added",
+                "Passport & Visa Documentation"
+              );
+            }
+
+            this.closePopovers();
           });
-
-        console.log("P¥ entry", pdocentry);
       }
-    });
-
-    var sendRmks = this.cfHelper.getXmlPayload("AddRemarkLLSRQ", {
-      Remark: () => {
-        let strRmk = "";
-
-        for (let i = 0; i < 10; i++) {
-          strRmk = strRmk.concat(
-            this.cfHelper.getXmlPayload("Remark", {
-              Text: "RMKRC" + i.toString(),
-            })
-          );
-        }
-        return strRmk;
-      },
-    });
-
-    var sendAlphaRmks = this.cfHelper.getXmlPayload("AddRemarkLLSRQ", {
-      Remark: () => {
-        let strRmk = "";
-        let myRemarks = [
-          { Code: "A", Text: "My A Text" },
-          { Code: "H", Text: "My H text" },
-        ];
-
-        for (let i = 0; i < myRemarks.length; i++) {
-          strRmk = strRmk.concat(
-            this.cfHelper.getXmlPayload("RemarkAlpha", {
-              Code: myRemarks[i].Code,
-              Text: myRemarks[i].Text,
-            })
-          );
-        }
-        return strRmk;
-      },
-    });
-
-    console.log(sendRmks);
-
-    // sendRmks = `<AddRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.0"><RemarkInfo><Remark Type="General"><Text>RMKRC0</Text></Remark><Remark Type="General"><Text>RMKRC1</Text></Remark><Remark Type="General"><Text>RMKRC2</Text></Remark><Remark Type="General"><Text>RMKRC3</Text></Remark><Remark Type="General"><Text>RMKRC4</Text></Remark><Remark Type="General"><Text>RMKRC5</Text></Remark><Remark Type="General"><Text>RMKRC6</Text></Remark><Remark Type="General"><Text>RMKRC7</Text></Remark><Remark Type="General"><Text>RMKRC8</Text></Remark><Remark Type="General"><Text>RMKRC9</Text></Remark></RemarkInfo></AddRemarkRQ>`;
-    // console.log(sendRmks);
-
-    getService(CommFoundHelper)
-      .sendSWSRequest({
-        action: "AddRemarkLLSRQ",
-        payload: sendAlphaRmks,
-        authTokenType: "SESSION",
-      })
-      .then((res) => {
-        this.setState({
-          response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
-        });
+      const modifyentries: any = tempList.filter(function (i) {
+        return i.isExisting === true;
       });
-    console.log(this.state.response);
+      if (modifyentries.length > 0) {
+        console.log(`There are ${modifyentries.length} that must be modified`);
+
+        sendRmks = this.cfHelper.getXmlPayload("ModifyRemarkLLSRQ", {
+          Remark: () => {
+            let strRmk = "";
+            for (let i = 0; i < modifyentries.length; i++) {
+              strRmk = strRmk.concat(
+                this.cfHelper.getXmlPayload("RemarkModify", {
+                  LineNumber: '"' + modifyentries[i].Id + '"',
+                  Code: "P",
+                  Text: this.getSabreString(modifyentries[i]),
+                })
+              );
+            }
+            return strRmk;
+          },
+        });
+        console.log(sendRmks);
+
+        getService(CommFoundHelper)
+          .sendSWSRequest({
+            action: "ModifyRemarkLLSRQ",
+            payload: sendRmks,
+            authTokenType: "SESSION",
+          })
+          .then((res) => {
+            this.setState({
+              response: res.errorCode
+                ? JSON.stringify(res, null, 2)
+                : res.value,
+            });
+            getService(CommFoundHelper).refreshTipSummary();
+            if (res.errorCode !== undefined && res.errorCode !== null) {
+              getService(IAreaService).showBanner(
+                "Error",
+                "Failed: ".concat(res.errorCode),
+                "Passport & Visa Documentation"
+              );
+            } else {
+              getService(IAreaService).showBanner(
+                "Success",
+                "Modified",
+                "Passport & Visa Documentation"
+              );
+            }
+            this.closePopovers();
+          });
+      }
+    }
   };
 
   private displayP() {
@@ -419,20 +436,21 @@ export class SASPassport extends React.Component<{}, OwnState> {
         );
 
         //create proper object and append to the temp array
+        let pvline = new PassportVisaItem();
+        (pvline.CountryDestination = match[1]),
+          (pvline.Citizenship = match[2]),
+          (pvline.NeedPassport = match[3]),
+          (pvline.NeedVisa = match[4]),
+          (pvline.HavePassport = match[5]),
+          (pvline.HaveVisa = match[6]),
+          (pvline.PrimaryDocument = match[7]),
+          (pvline.PassportExpSoon = match[8]),
+          (pvline.DocumentType = match[9]),
+          (pvline.Id = element.Id),
+          (pvline.isExisting = true),
+          (pvline.isChange = false),
+          console.log(this.getSabreString(pvline));
 
-        let pvline = {
-          Id: element.Id,
-          Existing: true,
-          CountryDestination: match[1],
-          Citizenship: match[2],
-          NeedPassport: match[3],
-          NeedVisa: match[4],
-          HavePassport: match[5],
-          HaveVisa: match[6],
-          PrimaryDocument: match[7],
-          PassportExpSoon: match[8],
-          DocumentType: match[9],
-        };
         // add to the array
         pvlines.push(pvline);
       } else {
@@ -444,21 +462,22 @@ export class SASPassport extends React.Component<{}, OwnState> {
     console.log(`Pvlines array has ${pvlines.length} rows `);
 
     if (pvlines.length === 0) {
-      let defaultLine = {
-        Id: 1000,
-        Existing: false,
-        CountryDestination: "",
-        Citizenship: "",
-        NeedPassport: "",
-        NeedVisa: "",
-        HavePassport: "",
-        HaveVisa: "",
-        PrimaryDocument: "",
-        PassportExpSoon: "",
-        DocumentType: "",
-      };
+      let blankline = new PassportVisaItem();
+
+      (blankline.Id = 1000),
+        (blankline.isExisting = false),
+        (blankline.CountryDestination = ""),
+        (blankline.Citizenship = ""),
+        (blankline.NeedPassport = ""),
+        (blankline.NeedVisa = ""),
+        (blankline.HavePassport = ""),
+        (blankline.HaveVisa = ""),
+        (blankline.PrimaryDocument = ""),
+        (blankline.PassportExpSoon = ""),
+        (blankline.DocumentType = ""),
+        (blankline.isChange = false);
       // add to array
-      pvlines.push(defaultLine);
+      pvlines.push(blankline);
     }
     // set state to be whatever is in pvlines (our temp array)
     this.setState({
@@ -474,185 +493,162 @@ export class SASPassport extends React.Component<{}, OwnState> {
     }
     return (
       <div className="tab-pane sas_passport_grid" id="passport">
-        <div className="row">
-          <div className="col-sm-1">
-            <label>Citizenship</label>
-          </div>
-          <div className="col-sm-1">
-            <label>Country Destination</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Need Passport?</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Need Visa?</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Have Passport?</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Have Visa?</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Primary document?</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Passport expire soon?</label>
-          </div>
-
-          <div className="col-sm-1">
-            <label>Document type?</label>
-          </div>
-          <div className="col-sm-3">
-            <label>Action</label>
-          </div>
-        </div>
-
         <form onSubmit={this.handleSubmit.bind(this)} autoComplete="off">
-          {this.state.PassportVisaDocList.map((s) => (
-            <div className="row" key={s.Id}>
-              <div className="col-sm-1">
-                {/* <label>Citizenship</label> */}
-                <input
-                  type="text"
-                  name="Citizenship"
-                  className="form-control"
-                  placeholder="ex. US"
-                  onChange={this.handleChange(s.Id)}
-                  value={s.Citizenship}
-                />
-              </div>
-              <div className="col-sm-1">
-                {/* <label>Country Destination</label> */}
-                <input
-                  type="text"
-                  name="CountryDestination"
-                  className="form-control"
-                  placeholder="ex. DE"
-                  onChange={this.handleChange(s.Id)}
-                  value={s.CountryDestination}
-                />
-              </div>
-              <div className="col-sm-1">
-                {/* <label>Need Passport?>/label> */}
-                <select
-                  name="NeedPassport"
-                  className="form-control"
-                  value={s.NeedPassport}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                </select>
-              </div>
-              <div className="col-sm-1">
-                {/* <label>Need Visa?</label> */}
-                <select
-                  name="NeedVisa"
-                  className="form-control"
-                  value={s.NeedVisa}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                  <option value="UNK">Unknown</option>
-                  <option value="ETA">ETA</option>
-                  <option value="ESTA">ESTA</option>
-                  <option value="COND">Conditional</option>
-                </select>
-              </div>
+          <table className="table">
+            <thead>
+              <tr>
+                <th>Citizenship</th>
+                <th>Destination</th>
+                <th>Need Passport</th>
+                <th>Need Visa</th>
+                <th>Have Passport</th>
+                <th>Have Visa</th>
+                <th>Primary Doc</th>
+                <th>Expires</th>
+                <th>Doc Type</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.PassportVisaDocList.map((s) => (
+                <tr key={s.Id}>
+                  <td>
+                    {/* {s.Id} */}
+                    {/* <label>Citizenship</label> */}
+                    <input
+                      type="text"
+                      name="Citizenship"
+                      className="form-control"
+                      onChange={this.handleChange(s.Id)}
+                      value={s.Citizenship}
+                    />
+                  </td>
+                  <td>
+                    {/* <label>Country Destination</label> */}
+                    <input
+                      type="text"
+                      name="CountryDestination"
+                      className="form-control"
+                      onChange={this.handleChange(s.Id)}
+                      value={s.CountryDestination}
+                    />
+                  </td>
+                  <td>
+                    {/* <label>Need Passport?>/label> */}
+                    <select
+                      name="NeedPassport"
+                      className="form-control"
+                      value={s.NeedPassport}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="YES">Yes</option>
+                      <option value="NO">No</option>
+                    </select>
+                  </td>
+                  <td>
+                    {/* <label>Need Visa?</label> */}
+                    <select
+                      name="NeedVisa"
+                      className="form-control"
+                      value={s.NeedVisa}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="YES">Yes</option>
+                      <option value="NO">No</option>
+                      <option value="UNK">Unknown</option>
+                      <option value="ETA">ETA</option>
+                      <option value="ESTA">ESTA</option>
+                      <option value="COND">Conditional</option>
+                    </select>
+                  </td>
 
-              <div className="col-sm-1">
-                {/* <label>Have Passport?</label> */}
-                <select
-                  name="HavePassport"
-                  className="form-control"
-                  value={s.HavePassport}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                  <option value="ADVSD">Advised</option>
-                  <option value="PROCESS">Being Processed</option>
-                  <option value="UNK">Unknown</option>
-                </select>
-              </div>
-              <div className="col-sm-1">
-                {/* <label>Have Visa?</label> */}
-                <select
-                  name="HaveVisa"
-                  className="form-control"
-                  value={s.HaveVisa}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                  <option value="ADVSD">Advised</option>
-                  <option value="PROCESS">Being Processed</option>
-                  <option value="WAIT">Delay reminder</option>
-                  <option value="DIY">PAX do on own</option>
-                  <option value="ARR">Upon arrival</option>
-                </select>
-              </div>
-              <div className="col-sm-1">
-                {/* <label>Primary document?</label> */}
-                <select
-                  name="PrimaryDocument"
-                  className="form-control"
-                  value={s.PrimaryDocument}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                </select>
-              </div>
+                  <td>
+                    {/* <label>Have Passport?</label> */}
+                    <select
+                      name="HavePassport"
+                      className="form-control"
+                      value={s.HavePassport}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="YES">Yes</option>
+                      <option value="NO">No</option>
+                      <option value="ADVSD">Advised</option>
+                      <option value="PROCESS">In Process</option>
+                      <option value="UNK">Unknown</option>
+                    </select>
+                  </td>
+                  <td>
+                    {/* <label>Have Visa?</label> */}
+                    <select
+                      name="HaveVisa"
+                      className="form-control"
+                      value={s.HaveVisa}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="YES">Yes</option>
+                      <option value="NO">No</option>
+                      <option value="ADVSD">Advised</option>
+                      <option value="PROCESS">In Process</option>
+                      <option value="WAIT">Delay reminder</option>
+                      <option value="DIY">PAX DIY</option>
+                      <option value="ARR">Upon arrival</option>
+                    </select>
+                  </td>
+                  <td>
+                    {/* <label>Primary document?</label> */}
+                    <select
+                      name="PrimaryDocument"
+                      className="form-control"
+                      value={s.PrimaryDocument}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="YES">Yes</option>
+                      <option value="NO">No</option>
+                    </select>
+                  </td>
 
-              <div className="col-sm-1">
-                {/* <label>Passport Expires Soon?</label> */}
-                <select
-                  name="PassportExpSoon"
-                  className="form-control"
-                  value={s.PassportExpSoon}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="YES">Yes</option>
-                  <option value="NO">No</option>
-                </select>
-              </div>
+                  <td>
+                    {/* <label>Passport Expires Soon?</label> */}
+                    <select
+                      name="PassportExpSoon"
+                      className="form-control"
+                      value={s.PassportExpSoon}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="YES">Yes</option>
+                      <option value="NO">No</option>
+                    </select>
+                  </td>
 
-              <div className="col-sm-1">
-                {/* <label>Document Type</label> */}
-                <select
-                  name="DocumentType"
-                  className="form-control"
-                  value={s.DocumentType}
-                  onChange={this.handleChangeSelect(s.Id)}
-                >
-                  <option value="">Choose</option>
-                  <option value="P">Passport</option>
-                  <option value="I">National ID</option>
-                </select>
-              </div>
-              <div className="col-sm-3">
-                <i
-                  className="fa fa-trash-alt"
-                  onClick={this.handleDeleteDoc(s.Id)}
-                />
-              </div>
-            </div>
-          ))}
+                  <td>
+                    {/* <label>Document Type</label> */}
+                    <select
+                      name="DocumentType"
+                      className="form-control"
+                      value={s.DocumentType}
+                      onChange={this.handleChangeSelect(s.Id)}
+                    >
+                      <option value="">Choose</option>
+                      <option value="P">Passport</option>
+                      <option value="I">National ID</option>
+                    </select>
+                  </td>
+                  <td>
+                    <i
+                      className="fa fa-trash-alt"
+                      onClick={this.handleDeleteDoc(s.Id)}
+                    />
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
           {errorOutput}
           <div className="row">
             <div className="col-md-12">

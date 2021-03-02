@@ -108,6 +108,27 @@ export class CommFoundHelper extends AbstractService {
       "</Text>" +
       "</Remark>",
 
+    ModifyRemarkLLSRQ:
+      '<ModifyRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.2">' +
+      "<RemarkInfo>{Remark}" +
+      "</RemarkInfo>" +
+      "</ModifyRemarkRQ>",
+
+    RemarkModify:
+      '<Remark Code="{Code}" Number={LineNumber} Type="Alpha-Coded">' +
+      "<Text>" +
+      "{Text}" +
+      "</Text>" +
+      "</Remark>",
+
+    DeleteRemark:
+      '<ModifyRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.2">' +
+      "<RemarkInfo><Remark Number={LineNumber} />" +
+      "</RemarkInfo>" +
+      "</ModifyRemarkRQ>",
+
+    RemarkDelete: '<Remark Number="{LineNumber}" />',
+
     SpecialReqDetails:
       "<SpecialReqDetails>" + "{AddRemarkRQ}" + "</SpecialReqDetails>",
 
@@ -142,6 +163,14 @@ export class CommFoundHelper extends AbstractService {
       "<HostCommand>{HostCommand}</HostCommand>" +
       "</Request>" +
       "</SabreCommandLLSRQ>",
+
+    PassportVisaEntry:
+      //3.P¥CA/NA-US/P-YES/V-NO/PS-YES/VS-NO/PD-YES/EXP-NO/D-P
+      '<Remark Code="{Code}" Type="Alpha-Coded">' +
+      "<Text>" +
+      "{Destination}¥/NA-{Nationality}/P-{PassportRequired}/V-{VisaRequired}/PS-{PassportStatus}/VS-{VisaStatus}/PD-{PrimaryDocument}/EXP-{ExpiresSoon}/D-{DocumentType}" +
+      "</Text>" +
+      "</Remark>",
   };
 
   getXmlPayload(name: string, values: any): string {
