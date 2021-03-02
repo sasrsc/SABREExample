@@ -78,6 +78,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
 
   cfHelper: CommFoundHelper = getService(CommFoundHelper);
 
+  // this is called when the component first loads
   componentDidMount() {
     console.log("Searching for P¥ ....");
     let reservationPromise: Promise<CommandMessageReservationRs> = getService(
@@ -89,6 +90,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
     });
   }
 
+  // this is used to format the sabre string entry as we need it
   public getSabreString(obj) {
     return (
       obj.CountryDestination +
@@ -110,10 +112,13 @@ export class SASPassport extends React.Component<{}, OwnState> {
       obj.DocumentType
     );
   }
+
+  // close the popover
   private closePopovers = (): void => {
     eventBus.triggerOnEventBus("hide-popovers", "novice-menu");
   };
 
+  // when they click to add another item into the array
   private addDocument() {
     let lastitem: any;
     if (this.state.PassportVisaDocList.length > 0) {
@@ -158,6 +163,8 @@ export class SASPassport extends React.Component<{}, OwnState> {
       lastPassVisaDocIndex: next + 1,
     });
   }
+
+  // when they change the text fields
   private handleChange = (id: number) => (
     e: React.ChangeEvent<HTMLInputElement>
   ) => {
@@ -174,6 +181,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
     });
   };
 
+  // when they change the select fields
   private handleChangeSelect = (id: number) => (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
@@ -189,6 +197,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
     });
   };
 
+  // when they want to delete an item in the array
   private handleDeleteDoc = (id: number) => (
     event: React.MouseEvent<HTMLInputElement>
   ) => {
@@ -237,6 +246,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
     }
   };
 
+  // when they delete a row or submit we will call this utility function to make sure there are no duplicate country lines
   public checkMultipleCountries = async () => {
     const localcopy = this.state.PassportVisaDocList;
     let duplicates = "";
@@ -281,6 +291,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
     return isError;
   };
 
+  // they click on submit
   private handleSubmit = async (
     event: React.FormEvent<HTMLFormElement>
   ): Promise<void> => {
@@ -403,12 +414,14 @@ export class SASPassport extends React.Component<{}, OwnState> {
     }
   };
 
+  // this is a native sabre call used primarily while testing
   private displayP() {
     // btn on the screen allows the agent to get this sabre response on the screen
     let sabreStr: string = "*P¥*IA";
     getService(NativeSabreCommand).handleSubmit(sabreStr);
   }
 
+  // called from the componentdidmount function to get all the P# remarks in the pnr
   public getRemarks(
     commandMessageReservationRs: CommandMessageReservationRs
   ): void {
