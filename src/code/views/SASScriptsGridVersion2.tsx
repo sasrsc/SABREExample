@@ -48,7 +48,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
       showThis: true,
       firstName: "Richard",
       lastName: "Clowes",
-      headerText: "Air Info",
+      headerText: "",
       color: "blue",
     };
 
@@ -113,7 +113,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
         <SASHeaderTemplateContext headertext={this.state.headerText} />
         <aside>
           <ul className="nav nav-tabs">
-            <li className="active">
+            {/* <li className="active">
               <a
                 href="#air"
                 onClick={this.handleClick("Air Info")}
@@ -139,8 +139,8 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
               >
                 <span className="fa fa-car"></span>
               </a>
-            </li>
-            <li>
+            </li>*/}
+            {/* <li className="active">
               <a
                 href="#qc"
                 onClick={this.handleClick("QC Info")}
@@ -148,8 +148,8 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
               >
                 <span className="fa fa-edit"></span>
               </a>
-            </li>
-            <li>
+            </li> */}
+            <li className="active">
               <a
                 href="#queues"
                 onClick={this.handleClick(
@@ -201,7 +201,7 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
           </ul>
         </aside>
         <article>
-          <div className="tab-pane active" id="air">
+          {/* <div className="tab-pane active" id="air">
             <ul className="list-group pull-left">
               <li className="list-group-item">This script</li>
               <li className="list-group-item">That script</li>
@@ -351,8 +351,8 @@ export class SASScriptsGridVersion2 extends React.Component<{}, OwnState> {
 
           <div className="tab-pane" id="car">
             <p>Something about hotels goes here.</p>
-          </div>
-          <SASInfoQC />
+          </div> */}
+          {/* <SASInfoQC /> */}
           <SASQueueSend closePopovers={() => {}} />
           <SASAppDispatcher closePopovers={() => {}} />
           <SASHotelHKtoGK closePopovers={() => {}} />

@@ -19,6 +19,7 @@ import CommFoundButton from "./views/cmdHelper/gdsData/CommFoundButton";
 import { ShellPnrComponent } from "./views/customWF/ShellPnrComponent";
 import { AfterSellPopover } from "./views/customWF/AfterSellPopover";
 import { BeforeEndHandler } from "./services/xtpoints/BeforeEndHandler";
+import SASMainPopover from "./views/SASMainPopover/SASMainPopover";
 import SasScripts from "./views/SasScripts";
 import SASScriptsGrid from "./views/SASScriptsGrid";
 import SASApiTest from "./views/SASApiTest";
@@ -250,6 +251,11 @@ export class Main extends Module {
       "novice-buttons",
       new WidgetXPConfig(CommFoundButton, -1000)
     );
+    getService(ExtensionPointService).addConfig(
+      "novice-buttons",
+      new WidgetXPConfig(SASMainPopover, 9999)
+    );
+
     getService(ExtensionPointService).addConfig(
       "novice-buttons",
       new WidgetXPConfig(CmdHelperButton, -1000)

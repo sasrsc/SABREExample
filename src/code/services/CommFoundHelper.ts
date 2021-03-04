@@ -164,6 +164,14 @@ export class CommFoundHelper extends AbstractService {
       "</Request>" +
       "</SabreCommandLLSRQ>",
 
+    GetProfile:
+      '<Sabre_OTA_ProfileToPNRRQ Target="Production" TimeStamp="2013-04-30T08:24:42.967Z" Version="6.55" xsi:schemaLocation="http://www.sabre.com/eps/schemas schemasSabre_OTA_ProfileCreateRQ.xsd" xmlns="http://www.sabre.com/eps/schemas" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">' +
+      "<FilterPath>" +
+      '<Profile ClientCode="TN" ClientContextCode="TMP" ProfileName="{Profile}" UniqueID="*" PNRMoveOrderSeqNo="1" DomainID="29JB" ProfileTypeCode="{Type}" BlindMoveByProfName="Y">' +
+      "</Profile>" +
+      "</FilterPath>" +
+      "</Sabre_OTA_ProfileToPNRRQ>",
+
     PassportVisaEntry:
       //3.P¥CA/NA-US/P-YES/V-NO/PS-YES/VS-NO/PD-YES/EXP-NO/D-P
       '<Remark Code="{Code}" Type="Alpha-Coded">' +

@@ -328,6 +328,8 @@ export class SASPassport extends React.Component<{}, OwnState> {
             return strRmk;
           },
         });
+        console.log(sendRmks);
+
         getService(CommFoundHelper)
           .sendSWSRequest({
             action: "AddRemarkLLSRQ",
@@ -360,7 +362,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
           });
       }
       const modifyentries: any = tempList.filter(function (i) {
-        return i.isExisting === true;
+        return i.isExisting === true && i.isChange === true;
       });
       if (modifyentries.length > 0) {
         console.log(`There are ${modifyentries.length} that must be modified`);
