@@ -74,9 +74,13 @@ export class ProfilePopover extends React.Component<
         authTokenType: "SESSION",
       })
       .then((res) => {
+        // "<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"no\"?><Sabre_OTA_ProfileToPNRRS xmlns=\"http://www.sabre.com/eps/schemas\" TimeStamp=\"2021-03-06T13:04:37.220Z\" Target=\"Production\" Version=\"6.63\">\n   <ResponseMessage>\n      <Errors>\n         <Error ErrorCode=\"680\" ErrorMessage=\"CONV2PNR::Nptnptvlapc00001_ppptn-cert1T20210306130437SCONV2PNR::No unique profile with 6785 name can be found\"/>\n      </Errors>\n   </ResponseMessage>\n</Sabre_OTA_ProfileToPNRRS>";
         this.setState({
           response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
         });
+
+        console.log(this.state.response);
+
         getService(CommFoundHelper).refreshTipSummary();
 
         if (res.errorCode !== undefined && res.errorCode !== null) {
@@ -93,7 +97,7 @@ export class ProfilePopover extends React.Component<
           );
         }
 
-        this.props.handleClose();
+        //this.props.handleClose();
       });
   }
 

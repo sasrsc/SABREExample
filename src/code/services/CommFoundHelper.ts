@@ -272,6 +272,7 @@ export class CommFoundHelper extends AbstractService {
    * buildDependencies :
    * { "sabre-ngv-communication": "*" }
    */
+
   sendExternalHttpRequest(
     request: RestRq,
     options?,

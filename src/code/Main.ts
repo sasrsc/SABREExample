@@ -33,6 +33,7 @@ import { BasicModel } from "./models/BasicModel";
 import { PersistModel } from "./models/PersistModel";
 import { SampleCustomCommandHandler } from "./services/SampleCustomCommandHandler";
 import { NativeSabreCommand } from "./services/NativeSabreCommand";
+import { DecodeStmtInfo } from "./util/decodeStmtInfo";
 import { LocalStore } from "./services/LocalStore";
 import { SoapView } from "./views/SoapView";
 import { GetResView } from "./views/GetResView";
@@ -232,6 +233,7 @@ export class Main extends Module {
 
     registerService(SampleCustomCommandHandler);
     registerService(NativeSabreCommand);
+    registerService(DecodeStmtInfo);
     registerService(PRCustomCommandHandler);
     registerService(LocalStoreHelperService);
     //services to back the Module operation
@@ -580,13 +582,22 @@ export class Main extends Module {
     console.log(reservation);
     var stmtinfo = reservation.Passengers.Passenger[0].NameReference;
     console.log(stmtinfo);
-    var employeeNumberArray = stmtinfo.split("-"); // SAS-6785-7206
-    var employeeNumber = employeeNumberArray[1]; // 6785
-    console.log(employeeNumber);
+    var decode = getService(DecodeStmtInfo).decode(stmtinfo);
+    console.log(decode);
+
+    // var employeeNumberArray = stmtinfo.split("-"); // SAS-6785-7206
+    // var employeeNumber = employeeNumberArray[1]; // 6785
+    // console.log(employeeNumber);
     // 2. create link to VA
+    // var url =
+    //   "https://itviya.sas.com/SASVisualAnalytics/?reportUri=%2Freports%2Freports%2F8e47b43a-7233-4d22-b4a1-16d0c77e5316&sectionIndex=0&sas-welcome=false&pr7188=" +
+    //   employeeNumber;
+    // console.log(url);
+    // window.open(url, "VA_Window");
+    // new version
     var url =
       "https://itviya.sas.com/SASVisualAnalytics/?reportUri=%2Freports%2Freports%2F8e47b43a-7233-4d22-b4a1-16d0c77e5316&sectionIndex=0&sas-welcome=false&pr7188=" +
-      employeeNumber;
+      decode.empNo;
     console.log(url);
     window.open(url, "VA_Window");
   }
@@ -618,11 +629,8 @@ export class Main extends Module {
 
   filterForHoteLodgingLimits(entries: NgvNudgeEntry[]): boolean {
     return (
-      entries.filter(
-        (entry, index, array) =>
-          entry.location == "HOTEL" &&
-          (entry.destination == "RDU" || entry.origin == "RDU")
-      ).length > 0
+      entries.filter((entry, index, array) => entry.location == "HOTEL")
+        .length > 0
     );
   }
 
