@@ -4,35 +4,91 @@
   * {
     margin: 10px;
   }
+
+  .popover-wrapper {
+    display: grid;
+    grid-template-areas:
+      "header header"
+      "aside article";
+    grid-template-columns: 1fr 15fr;
+    overflow: hidden;
+
+    header {
+      grid-area: header;
+      background-color: #eaf6ff;
+      padding: 10px;
+      display: flex;
+      justify-content: space-between;
+
+      h3 {
+        margin: 0px;
+      }
+
+      img {
+        height: 31px;
+        width: 75px;
+      }
+    } // end of header
+
+    aside {
+      grid-area: sidebar;
+      background-color: #031459;
+      color: white;
+      padding: 0px;
+
+      .nav-tabs {
+        border-bottom: none;
+      }
+
+      li {
+        float: none;
+        margin: 0;
+
+        a {
+          margin-right: 0;
+          border: 0;
+          border-radius: 0;
+          padding: 10px 25px;
+          text-align: center;
+
+          &:hover {
+            background-color: #0c97fb;
+          }
+        }
+      }
+
+      .fa {
+        color: #fff;
+      }
+
+      .active .fa {
+        color: #031459;
+      }
+    } // end of aside
+
+    article {
+      grid-area: article;
+      padding: 10px;
+      overflow-y: auto;
+      .tab-pane {
+        display: none;
+        background-color: #fff;
+        padding: 1rem;
+
+        h3 {
+          margin-top: 0px;
+        }
+      }
+      .active {
+        display: block;
+      }
+    } // end of article
+  } // of popover-wrapper
 }
 
 .sas-bottom-right {
   display: flex;
   justify-content: flex-end;
-}
-
-.sas_header_popover {
-  header {
-    grid-area: header;
-    background-color: #eaf6ff;
-    padding: 10px;
-    display: flex;
-    justify-content: space-between;
-
-    h3 {
-      margin: 0px;
-    }
-    span {
-      //display: block;
-      vertical-align: top;
-    }
-
-    img {
-      // display: inline-block;
-      height: 31px;
-      width: 75px;
-    }
-  }
 }
 
 .sas_passport_grid {

@@ -12,6 +12,7 @@ import { RestResponse } from "sabre-ngv-communication/interfaces/RestResponse";
 import { RestRq } from "sabre-ngv-communication/interfaces/RestRq";
 import { AutoComplete } from "../components/AutoComplete";
 import { Button } from "../components/Button";
+import { Variables } from "../services/Variables";
 
 export interface MyProps {
   closePopovers: () => void;
@@ -40,6 +41,7 @@ export interface MyState {
   password?: string;
   continentcode?: string;
   sortby?: string;
+  mytoken?: any;
 }
 
 export class SASAppDispatcher extends React.Component<MyProps, MyState> {
@@ -48,6 +50,10 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     this.handleChange = this.handleChange.bind(this);
     this.closePopovers = this.closePopovers.bind(this);
     this.handleSubmitSas = this.handleSubmitSas.bind(this);
+    this.handleSubmitSAS2 = this.handleSubmitSAS2.bind(this);
+    this.handleSubmitSAS3 = this.handleSubmitSAS3.bind(this);
+    this.handleSubmitSAS4 = this.handleSubmitSAS4.bind(this);
+    this.handleFetch = this.handleFetch.bind(this);
     this.handleSubmitExternal = this.handleSubmitExternal.bind(this);
 
     this.state = {
@@ -70,6 +76,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
       continentcode: "EU",
       sortby: "countrycode",
       filename2: "api.sample",
+      mytoken: {},
     };
   }
 
@@ -207,7 +214,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     });
   };
 
-  handleSubmitSas2 = (event?: React.FormEvent<HTMLFormElement>) => {
+  handleSubmitSAS2 = (event?: React.FormEvent<HTMLButtonElement>) => {
     event.preventDefault();
     console.log(`Calling SAS Rest API`);
     //**************************************** */
@@ -250,6 +257,153 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     });
   };
 
+  handleSubmitSAS3 = (e) => {
+    e.preventDefault();
+
+    const url: string = this.state.itviya;
+    const data = {
+      grant_type: "password",
+      response_type: "bearer",
+      username: "sasrsc",
+      password: "H1ke1ntheMtns!",
+    };
+
+    const headers = {
+      Accept: "application/json",
+      "Content-Type": "application/x-www-form-urlencoded",
+      Authorization: "Basic " + btoa("sas.ec:"),
+    };
+
+    fetch(url, {
+      method: "POST",
+      headers: headers,
+      body: JSON.stringify(data),
+    })
+      .then((response) => response.text())
+      .then((data) => {
+        console.log("Success:", data);
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+      });
+  };
+
+  handleSubmitSAS4(e): void {
+    e.preventDefault();
+    console.log(`Attempting v4`);
+    const url2: string = "https://itviya.sas.com/SASLogon/oauth/token";
+    // const data = {
+    //   grant_type: "password",
+    //   response_type: "bearer",
+    //   username: "sasrsc",
+    //   password: "H1ke1ntheMtns!",
+    // };
+    // const options = {
+    //   method: "POST",
+    //   body: JSON.stringify(data),
+    //   headers: {
+    //     Accept: "application/json",
+    //     "Content-Type": "application/x-www-form-urlencoded",
+    //     Authorization: "Basic " + btoa("sas.ec:"),
+    //   },
+    // };
+    fetch(url2, {
+      method: "POST",
+      headers: {
+        Accept: "application/json",
+        "Content-Type": "application/x-www-form-urlencoded",
+        Authorization: "Basic " + btoa("sas.ec:"),
+      },
+      body:
+        "grant_type=password&response_type=bearer&username=sasrsc&password=H1ke1ntheMtns!",
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        let returnObj = responseJson;
+        returnObj["token_start"] = new Date();
+        returnObj["token_end"] = new Date(Date.now() + returnObj.expires_in);
+        this.setState({
+          mytoken: returnObj,
+        });
+        this.handleFetch();
+      });
+    // const httpMethod = "POST";
+    // const data = {
+    //   grant_type: "password",
+    //   response_type: "bearer",
+    //   username: "sasrsc",
+    //   password: "H1ke1ntheMtns!",
+    // };
+    // const headers = {
+    //   Accept: "application/json",
+    //   "Content-Type": "application/x-www-form-urlencoded",
+    //   Authorization: "Basic " + btoa("sas.ec:"),
+    // };
+    // send POST request
+
+    // fetch(url2, options)
+    //   .then((res) => res.json())
+
+    //   .then((res) => console.log(res));
+    // const resProm = getService(RestApiService).sendExternal({
+    //   httpMethod: httpMethod,
+    //   url: url2,
+    //   payload: data,
+    //   headers: headers,
+    // });
+
+    // resProm
+    //   .then((response) => {
+    //     console.log(response);
+    //   })
+    //   .catch((error) => {
+    //     console.log(error);
+    //   });
+  }
+
+  handleFetch() {
+    console.log(`Calling SAS Rest API`);
+    //**************************************** */
+    const url2: string =
+      "https://itviya.sas.com/SASJobExecution/?_PROGRAM=/Corporate%20Services/Travel%20Operations/SAS_Code/sabreApi&&_action=execute&_output_type=json" +
+      "&filename=" +
+      this.state.filename2;
+    console.log(url2);
+    let token: string = this.state.mytoken.access_token;
+
+    fetch(url2, {
+      method: "GET",
+      headers: {
+        Accept: "application/vnd.sas.collection+json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        let returnObj = responseJson;
+        let loadinfo = {
+          filename: this.state.filename2,
+          refreshed: new Date(),
+          count: returnObj.length,
+          isLoaded: true,
+        };
+        console.log(loadinfo);
+        getService(Variables).setGlobal("uploads", loadinfo);
+
+        this.setState({
+          jsonData: returnObj,
+        });
+        getService(Variables).setGlobal("costcenters", returnObj);
+        console.log(
+          "costcenter list:",
+          getService(Variables).getGlobal("costcenters")
+        );
+        console.log(
+          "costcenter list:",
+          getService(Variables).getGlobal("message")
+        );
+      });
+  }
   // get queue info
 
   render(): JSX.Element {
@@ -325,7 +479,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
             </div>
           </form>
 
-          <form onSubmit={this.handleSubmitSas2} ref="form">
+          <form ref="form">
             <div className="container">
               <div className="row">
                 <select
@@ -348,10 +502,28 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
                 <button
                   type="submit"
                   id="submit-button"
+                  onClick={this.handleSubmitSAS2}
                   className="submit-button btn btn-success"
                 >
                   Submit
                 </button>
+                <button
+                  type="submit"
+                  id="submit-button"
+                  onClick={this.handleSubmitSAS3}
+                  className="submit-button btn btn-success"
+                >
+                  Attempting Fetch v3
+                </button>
+                <button
+                  type="submit"
+                  id="submit-button"
+                  onClick={this.handleSubmitSAS4}
+                  className="submit-button btn btn-success"
+                >
+                  Attempting Fetch v4
+                </button>
+
                 <p>Autocomplete</p>
                 {/* <AutoComplete
                   name="costcenter"

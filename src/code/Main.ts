@@ -3,7 +3,7 @@ import { DtoService } from "sabre-ngv-app/app/services/impl/DtoService";
 import { registerService, getService, context } from "./Context";
 
 import { CommFoundHelper } from "./services/CommFoundHelper";
-
+import { Variables } from "./services/Variables";
 import { ExtensionPointService } from "sabre-ngv-xp/services/ExtensionPointService";
 import { RedAppSidePanelConfig } from "sabre-ngv-xp/configs/RedAppSidePanelConfig";
 import { WidgetXPConfig } from "sabre-ngv-xp/configs/WidgetXPConfig";
@@ -239,7 +239,7 @@ export class Main extends Module {
     //services to back the Module operation
     registerService(CommFoundHelper);
     registerService(BeforeEndHandler);
-
+    registerService(Variables);
     this.localStore = new LocalStore();
 
     getService(PRCustomCommandHandler).setLocalStore(this.localStore);
