@@ -1,16 +1,17 @@
 @import "../../core/styles/core-styles";
 
+:root {
+  --sasblue: #0378cd;
+  --saspowder: #eaf6ff;
+  --saslightblue: #85cbfd;
+  --sasdenim: #013459;
+  --sasazure: #0c97fb;
+}
+
 .com-sabre-example-redapp-web-module {
   // * {
   //   margin: 10px;
   // }
-  :root {
-    --sasblue: #0378cd;
-    --saspowder: #eaf6ff;
-    --saslightblue: #85cbfd;
-    --sasdenim: #013459;
-    --sasazure: #0c97fb;
-  }
 
   .popover-wrapper {
     display: grid;
@@ -96,6 +97,13 @@
     footer {
       grid-area: footer;
       background-color: var(--saspowder);
+      padding: 10px;
+      display: flex;
+      //align-self: flex-end;
+      justify-content: flex-end;
+      // button {
+      //   float: right;
+      // }
     }
   } // of popover-wrapper
 }

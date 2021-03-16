@@ -26,7 +26,8 @@ export class PopoverFormSAS extends React.Component<PopoverFormProps, {}> {
           <aside>{this.props.navigation}</aside>
           <article>{this.props.children}</article>
           <footer>
-            <div className="action-buttons">{this.props.buttons}</div>
+            {/* <div className="action-buttons">{this.props.buttons}</div> */}
+            {this.props.buttons}
           </footer>
         </div>
       </div>
