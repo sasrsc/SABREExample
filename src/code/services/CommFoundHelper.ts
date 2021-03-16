@@ -20,11 +20,12 @@ import { CommandMessageReservationRs } from "sabre-ngv-pos-cdm/reservation";
 import { PnrPublicService } from "sabre-ngv-app/app/services/impl/PnrPublicService";
 
 import { AgentProfileService } from "sabre-ngv-app/app/services/impl/AgentProfileService";
-
+import { Variables } from "../services/Variables";
 /*
  * class CommFoundHelper, utiility methods to consume main Communication Foundation APIs
  *
  */
+
 export class CommFoundHelper extends AbstractService {
   static SERVICE_NAME =
     "com-sabre-redapp-showcase-web-module-service-commfound";
@@ -295,4 +296,142 @@ export class CommFoundHelper extends AbstractService {
   getAgentProfileService(): AgentProfileService {
     return getService(AgentProfileService);
   }
+
+  getSASToken = async (): Promise<string> => {
+    //e.preventDefault();
+    console.log(`Getting SAS Token`);
+    let token = getService(Variables).getGlobal("SASToken");
+    let getNewToken = true;
+    if (Object.keys(token).length > 0) {
+      if (Date.now() < token.token_end) {
+        console.log(`Existing token is still good`);
+        getNewToken = false;
+        // return existing token
+        return token.access_token;
+      }
+    }
+    if (getNewToken === true) {
+      const url: string = "https://itviya.sas.com/SASLogon/oauth/token";
+      let returnObj: any = {};
+      return fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: "Basic " + btoa("sas.ec:"),
+        },
+        body:
+          "grant_type=password&response_type=bearer&username=sasrsc&password=H1ke1ntheMtns!",
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          returnObj = responseJson;
+          returnObj["token_start"] = new Date();
+          returnObj["token_end"] = new Date(Date.now() + returnObj.expires_in);
+          console.log(returnObj);
+          //return returnObj;
+          console.log(`Returning SAS Token`);
+          getService(Variables).setGlobal("SASToken", returnObj);
+          return returnObj.access_token;
+          //return returnObj;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  //  getSASToken = async (): Promise<string> => {
+  //  getFile = async (file, token): Promise<any> => {
+  getFile(file, token) {
+    console.log(`Getting ${file} Using SAS Rest API`);
+    //**************************************** */
+    const url: string =
+      "https://itviya.sas.com/SASJobExecution/?_PROGRAM=/Corporate%20Services/Travel%20Operations/SAS_Code/sabreApi&&_action=execute&_output_type=json" +
+      "&filename=" +
+      file;
+    //let returnObj: any = [];
+    fetch(url, {
+      method: "GET",
+      headers: {
+        Accept: "application/vnd.sas.collection+json",
+        Authorization: "Bearer " + token,
+      },
+    })
+      .then((response) => response.json())
+      .then((responseJson) => {
+        let returnObj = responseJson;
+        let loadinfo = {
+          filename: file,
+          refreshed: new Date(),
+          count: returnObj.length,
+          isLoaded: true,
+        };
+        console.log(loadinfo);
+        getService(Variables).setGlobal(file, returnObj);
+        getService(Variables).appendGlobalUniqueVar("uploads", loadinfo);
+        console.log(
+          `Finished ${file} Processing SAS Rest API with ${returnObj.length} rows...`
+        );
+        //return returnObj;
+      })
+      .catch((err) => {
+        console.log(err);
+        let loadinfo = {
+          filename: file,
+          refreshed: new Date(),
+          count: 0,
+          isLoaded: false,
+        };
+        getService(Variables).appendGlobalUniqueVar("uploads", loadinfo);
+
+        //return err;
+      });
+  }
+
+  getGlobalVariables() {
+    console.log(`Getting Global Variables`);
+    getService(CommFoundHelper).getGlobalVariable("sabreGetCostcenters.sas");
+    getService(CommFoundHelper).getGlobalVariable("sabreGetProjects.sas");
+    getService(CommFoundHelper).getGlobalVariable("sabreGetGroups.sas");
+    getService(CommFoundHelper).getGlobalVariable("sabreGetLodgingLimits.sas");
+    let loads = getService(Variables).getGlobal("uploads");
+    console.log(`Finished Getting Global Variables ${loads}`);
+    //getService(CommFoundHelper).getFile(file, token);
+  }
+
+  getGlobalVariable = async (file: string): Promise<any> => {
+    console.log(`1: Calling Get a Token`);
+    // get token key - wait on the response
+    try {
+      console.log(`2: Inside the try before token`);
+      const token = await getService(CommFoundHelper).getSASToken();
+      //let next = await token;
+      //let token2: string = token.access_token;
+      console.log(`3: I should have the token ${token}`);
+      console.log(`4: Now go and get ${file}`);
+      getService(CommFoundHelper).getFile(file, token);
+      console.log(`5: after get file`);
+    } catch (err) {
+      // handle the error properly
+      // {"errorCode":"-300","message":"Job timed out before completion"}
+      console.log(err);
+    } finally {
+      console.log(`6: finished`);
+    }
+
+    console.log(`7: ***Outside #1***`);
+    // if successful get file
+
+    // then get the file
+
+    // finally send msg to alert agent
+
+    // error handling
+
+    //console.log(`Getting Global Variables=${file}`);
+    // look into promise / async / await
+
+    //console.log(`My token is ${token}`);
+  };
 }

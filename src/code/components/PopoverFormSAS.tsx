@@ -17,16 +17,18 @@ export class PopoverFormSAS extends React.Component<PopoverFormProps, {}> {
 
   render(): JSX.Element {
     return (
-      <div className="com-sabre-example-redapp-web-module popover-wrapper">
-        <header>
-          <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
-          <h3>{this.props.title}</h3>
-        </header>
-        <aside>{this.props.navigation}</aside>
-        <article>{this.props.children}</article>
-        <footer>
-          <div className="action-buttons">{this.props.buttons}</div>
-        </footer>
+      <div className="com-sabre-example-redapp-web-module">
+        <div className="popover-wrapper">
+          <header>
+            <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
+            <h3>{this.props.title}</h3>
+          </header>
+          <aside>{this.props.navigation}</aside>
+          <article>{this.props.children}</article>
+          <footer>
+            <div className="action-buttons">{this.props.buttons}</div>
+          </footer>
+        </div>
       </div>
     );
   }

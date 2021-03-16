@@ -32,6 +32,7 @@ export class IntroPopover extends React.Component<
     this.handleChange = this.handleChange.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
     this.handleExecute = this.handleExecute.bind(this);
+    this.handleRefreshLoad = this.handleRefreshLoad.bind(this);
   }
 
   state: CommandServicePopoverState = {
@@ -39,17 +40,36 @@ export class IntroPopover extends React.Component<
     showRq: true,
     showRs: true,
     cmdResponse: null,
-    loading: {},
+    loading: [],
   };
 
   componentDidMount() {
     let uploads = getService(Variables).getGlobal("uploads");
     console.log(uploads);
-    if (uploads.filename) {
-      uploads.aging = moment(uploads.refreshed).fromNow();
-      uploads.lastload = moment(uploads.refreshed).toString();
+    if (uploads.length > 0) {
+      console.log(`${uploads.length} items in the array`);
+
+      const newArray = uploads.map((i) =>
+        i.filename !== ""
+          ? {
+              ...i,
+              aging: moment(i.refreshed).fromNow(),
+              lastload: moment(i.refreshed).toString(),
+            }
+          : i
+      );
+      console.log(newArray);
+      newArray.sort(function (a, b) {
+        return b.refreshed - a.refreshed;
+      });
+
+      //loop through the array and add another property for each
+      // uploads.aging = moment(uploads.refreshed).fromNow();
+      // uploads.lastload = moment(uploads.refreshed).toString();
       // uploads.isLoadedStr = uploads.isloaded.toString();
-      this.setState({ loading: uploads });
+      this.setState({ loading: newArray });
+    } else {
+      console.log(`The uploads array is empty`);
     }
   }
   handleChange(e): void {
@@ -74,6 +94,12 @@ export class IntroPopover extends React.Component<
       });
   }
 
+  handleRefreshLoad = (file: string) => (e) => {
+    // refresh the file
+    getService(CommFoundHelper).getGlobalVariable(file);
+    this.props.handleClose();
+  };
+
   renderButtons(): JSX.Element[] {
     return [
       <Button
@@ -86,43 +112,6 @@ export class IntroPopover extends React.Component<
   }
 
   render(): JSX.Element {
-    let loadingOutput;
-
-    if (this.state.loading.filename) {
-      loadingOutput = (
-        <Table striped bordered condensed hover>
-          <thead>
-            <tr>
-              <th>File</th>
-              <th>Date/Time</th>
-              <th>Count</th>
-              <th>Live</th>
-              <th>Sucess</th>
-              <th>Action</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr>
-              <td>{this.state.loading.filename}</td>
-              <td>{this.state.loading.lastload}</td>
-              <td>{this.state.loading.count}</td>
-              <td>{this.state.loading.aging}</td>
-              <td>
-                {this.state.loading.isLoaded ? (
-                  <span className="fa fa-check"> </span>
-                ) : (
-                  <span className="fa fa-times"> </span>
-                )}
-              </td>
-              <td>
-                <span className="fa fa-sync"></span>
-              </td>
-            </tr>
-          </tbody>
-        </Table>
-      );
-    }
-
     return (
       <>
         <PopoverFormSAS
@@ -132,48 +121,80 @@ export class IntroPopover extends React.Component<
           buttons={this.renderButtons()}
           navigation={this.props.navigation}
         >
-          <article>
-            <p>Welcome to the SAS WebApp....</p>
-            <p>
-              This is a more modern, improved version of the SABRE Scripts that
-              Nancy has so perfected over the years.
-            </p>
-            <ul>
-              <li>
-                <a
-                  href="https://sasoffice365.sharepoint.com/sites/CorporateTravelUSPrivate"
-                  target="_blank"
-                >
-                  TAS Eyes Only
-                </a>
-              </li>
-              <li>
-                <a
-                  href="https://sasoffice365.sharepoint.com/sites/CorporateTravelUSPrivate/SitePages/International-Travel-Review.aspx"
-                  target="_blank"
-                >
-                  COVID-19 Travel Review - Agent Help
-                </a>
-              </li>
-              <li>
-                <a
-                  href="http://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.nonref_main.sas"
-                  target="_blank"
-                >
-                  Non Ref
-                </a>
-              </li>
-              <li>
-                <a
-                  href="http://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.passport_main.sas"
-                  target="_blank"
-                >
-                  Passport
-                </a>
-              </li>
-            </ul>
-            {loadingOutput}
-          </article>
+          <h2>Welcome to the SAS WebApp for SABRE....</h2>
+          <p>
+            This is a more modern, improved version of the SABRE Scripts that
+            Nancy has so perfected over the years.
+          </p>
+          <ul>
+            <li>
+              <a
+                href="https://sasoffice365.sharepoint.com/sites/CorporateTravelUSPrivate"
+                target="_blank"
+              >
+                TAS Eyes Only
+              </a>
+            </li>
+            <li>
+              <a
+                href="https://sasoffice365.sharepoint.com/sites/CorporateTravelUSPrivate/SitePages/International-Travel-Review.aspx"
+                target="_blank"
+              >
+                COVID-19 Travel Review - Agent Help
+              </a>
+            </li>
+            <li>
+              <a
+                href="http://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.nonref_main.sas"
+                target="_blank"
+              >
+                Non Ref
+              </a>
+            </li>
+            <li>
+              <a
+                href="http://sww.sas.com/sww-bin/broker94?_service=appprod94&_program=tasprod.passport_main.sas"
+                target="_blank"
+              >
+                Passport
+              </a>
+            </li>
+          </ul>
+          <Table striped bordered condensed hover>
+            <thead>
+              <tr>
+                <th>File</th>
+                <th>Date/Time</th>
+                <th>Count</th>
+                <th>Live</th>
+                <th>Sucess</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              {this.state.loading.map((s) => (
+                <tr key={s.filename}>
+                  <td>{s.filename}</td>
+                  <td>{s.lastload}</td>
+                  <td>{s.count}</td>
+                  <td>{s.aging}</td>
+                  <td>
+                    {s.isLoaded ? (
+                      <span className="fa fa-check"> </span>
+                    ) : (
+                      <span className="fa fa-times"> </span>
+                    )}
+                  </td>
+                  <td>
+                    <span
+                      onClick={this.handleRefreshLoad(s.filename)}
+                      className="fa fa-sync"
+                    ></span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </Table>
         </PopoverFormSAS>
       </>
     );

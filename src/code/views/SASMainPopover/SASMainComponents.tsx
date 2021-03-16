@@ -95,88 +95,89 @@ export class SASMainComponents extends React.Component<
 
   renderNavigation(): JSX.Element {
     return (
-      <div className="navigation">
-        <ul className="nav nav-pills tabs-left">
-          <li
-            className={
-              this.state.currentView == availableForms.intro
-                ? "active"
-                : "xp-context"
-            }
+      // <div className="navigation">
+      // <ul className="nav nav-pills tabs-left">
+      <ul className="nav nav-tabs">
+        <li
+          className={
+            this.state.currentView == availableForms.intro
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.intro)}
           >
-            <a
-              href="#"
-              className="tab"
-              onClick={this.handleFormChange(availableForms.intro)}
-            >
-              <span className="fa fa-book"></span>
-            </a>
-          </li>
-          <li
-            className={
-              this.state.currentView == availableForms.hotelPassive
-                ? "active"
-                : "xp-context"
-            }
+            <span className="fa fa-book"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.hotelPassive
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.hotelPassive)}
           >
-            <a
-              href="#"
-              className="tab"
-              onClick={this.handleFormChange(availableForms.hotelPassive)}
-            >
-              <span className="fa fa-bed"></span>
-            </a>
-          </li>
-          <li
-            className={
-              this.state.currentView == availableForms.passportDocumentation
-                ? "active"
-                : "xp-context"
-            }
+            <span className="fa fa-bed"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.passportDocumentation
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(
+              availableForms.passportDocumentation
+            )}
           >
-            <a
-              href="#"
-              className="tab"
-              onClick={this.handleFormChange(
-                availableForms.passportDocumentation
-              )}
-            >
-              <span className="fa fa-passport"></span>
-            </a>
-          </li>
-          <li
-            className={
-              this.state.currentView == availableForms.queuePref
-                ? "active"
-                : "xp-context"
-            }
+            <span className="fa fa-passport"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.queuePref
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.queuePref)}
           >
-            <a
-              href="#"
-              className="tab"
-              onClick={this.handleFormChange(availableForms.queuePref)}
-            >
-              <span className="fa fa-list-ol"></span>
-            </a>
-          </li>
+            <span className="fa fa-list-ol"></span>
+          </a>
+        </li>
 
-          <li
-            className={
-              this.state.currentView == availableForms.profiles
-                ? "active"
-                : "xp-context"
-            }
+        <li
+          className={
+            this.state.currentView == availableForms.profiles
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.profiles)}
           >
-            <a
-              href="#"
-              className="tab"
-              onClick={this.handleFormChange(availableForms.profiles)}
-            >
-              <span className="fa fa-users"></span>
-            </a>
-          </li>
-        </ul>
-      </div>
+            <span className="fa fa-users"></span>
+          </a>
+        </li>
+      </ul>
+      // </div>
     );
   }
 

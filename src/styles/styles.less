@@ -1,21 +1,30 @@
 @import "../../core/styles/core-styles";
 
 .com-sabre-example-redapp-web-module {
-  * {
-    margin: 10px;
+  // * {
+  //   margin: 10px;
+  // }
+  :root {
+    --sasblue: #0378cd;
+    --saspowder: #eaf6ff;
+    --saslightblue: #85cbfd;
+    --sasdenim: #013459;
+    --sasazure: #0c97fb;
   }
 
   .popover-wrapper {
     display: grid;
     grid-template-areas:
       "header header"
-      "aside article";
+      "aside article"
+      "footer footer";
     grid-template-columns: 1fr 15fr;
     overflow: hidden;
 
     header {
       grid-area: header;
-      background-color: #eaf6ff;
+      //background-color: #eaf6ff;
+      background-color: var(--saspowder);
       padding: 10px;
       display: flex;
       justify-content: space-between;
@@ -31,8 +40,8 @@
     } // end of header
 
     aside {
-      grid-area: sidebar;
-      background-color: #031459;
+      grid-area: aside;
+      background-color: var(--sasdenim);
       color: white;
       padding: 0px;
 
@@ -52,7 +61,7 @@
           text-align: center;
 
           &:hover {
-            background-color: #0c97fb;
+            background-color: var(--sasazure);
           }
         }
       }
@@ -62,7 +71,7 @@
       }
 
       .active .fa {
-        color: #031459;
+        color: var(--sasdenim);
       }
     } // end of aside
 
@@ -83,6 +92,11 @@
         display: block;
       }
     } // end of article
+
+    footer {
+      grid-area: footer;
+      background-color: var(--saspowder);
+    }
   } // of popover-wrapper
 }
 

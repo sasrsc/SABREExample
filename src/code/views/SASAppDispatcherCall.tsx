@@ -53,6 +53,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
     this.handleSubmitSAS2 = this.handleSubmitSAS2.bind(this);
     this.handleSubmitSAS3 = this.handleSubmitSAS3.bind(this);
     this.handleSubmitSAS4 = this.handleSubmitSAS4.bind(this);
+    this.handleSubmitBaseLine = this.handleSubmitBaseLine.bind(this);
     this.handleFetch = this.handleFetch.bind(this);
     this.handleSubmitExternal = this.handleSubmitExternal.bind(this);
 
@@ -147,7 +148,7 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
       });
   };
 
-  public getSasToken = async (user: string, password: string) => {
+  public getSasToken = async (user: string, password: string): Promise<any> => {
     const url: string = this.state.itviya;
     const data = {
       grant_type: "password",
@@ -172,7 +173,6 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
         // Resolve the promise
 
         resolve(response);
-        console.log(response);
       });
     });
   };
@@ -406,6 +406,32 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
   }
   // get queue info
 
+  handleSubmitBaseLine(e) {
+    // https://gitlab.sas.com/GEL/workshops/PSGEL272-using-rest-apis-in-sas-viya-4/-/blob/master/02_Working_with_REST_APIs/02_014_Calling_Admin_REST_APIs_Using_Javascript.md
+    e.preventDefault();
+    let fn = "sabreGetCostcenters.sas";
+    console.log(`Running Baseline Rest API call for ${fn}`);
+
+    this.getSasToken("sasrsc", "H1ke1ntheMtns!").then(function (response) {
+      const headers = {
+        Accept: "application/vnd.sas.collection+json",
+        Authorization: "Bearer " + response.access_token,
+      };
+      // Call the REST API endpoint for folders
+
+      $.ajax({
+        url:
+          "https://itviya.sas.com/SASJobExecution/?_PROGRAM=/Corporate%20Services/Travel%20Operations/SAS_Code/sabreApi&&_action=execute&_output_type=json&filename=" +
+          fn,
+        type: "GET",
+        headers: headers,
+      }).then(function (response) {
+        // Display the list of folders in the browser console log
+        console.log(response);
+      });
+    });
+  }
+
   render(): JSX.Element {
     return (
       <>
@@ -522,6 +548,14 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
                   className="submit-button btn btn-success"
                 >
                   Attempting Fetch v4
+                </button>
+                <button
+                  type="submit"
+                  id="submit-button"
+                  onClick={this.handleSubmitBaseLine}
+                  className="submit-button btn btn-success"
+                >
+                  Xavier's version getting costcenters
                 </button>
 
                 <p>Autocomplete</p>

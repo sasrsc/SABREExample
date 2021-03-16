@@ -7,19 +7,18 @@ export class Variables extends AbstractService {
 
   private jsContent = null;
 
-  private jsGlobals = {
-    costcenters: [
-      {
-        key: "1234",
-        value: "Travel",
-      },
-      {
-        key: "9999",
-        value: "Sales",
-      },
-    ],
+  private jsGlobals: any = {
+    costcenters: [],
+    projects: [],
+    groups: [],
+    lodgingLimits: [],
+    preferredHotels: [],
+    prefCodes: [],
+    agentInfo: [],
+    managers: [],
     message: "Hello World - About This",
-    uploads: {},
+    SASToken: {},
+    uploads: [],
   };
 
   getFromJson(path: string): any {
@@ -46,10 +45,28 @@ export class Variables extends AbstractService {
   }
 
   getGlobal(key: string): any {
+    // returns the global variable
     return this.jsGlobals[key];
   }
 
   setGlobal(key: string, value) {
+    // sets the value of the global variable to whatever is passed...
     this.jsGlobals[key] = value;
+  }
+
+  appendGlobal(key: string, value) {
+    // add item to the list
+    console.log(`Adding for ${key}`);
+    this.jsGlobals[key].push(value);
+  }
+
+  appendGlobalUniqueVar(key: string, value) {
+    // remove the value if it exists
+    this.jsGlobals[key] = this.jsGlobals[key].filter(
+      (item) => item.filename !== value.filename
+    );
+    // add item to the list
+    console.log(`Adding for ${key}`);
+    this.jsGlobals[key].push(value);
   }
 }

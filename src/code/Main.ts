@@ -15,7 +15,6 @@ import { MyPnr } from "./views/MyPnr";
 
 import CmdHelperButton from "./views/cmdHelper/custom/CmdHelperButton";
 import CommFoundButton from "./views/cmdHelper/gdsData/CommFoundButton";
-
 import { ShellPnrComponent } from "./views/customWF/ShellPnrComponent";
 import { AfterSellPopover } from "./views/customWF/AfterSellPopover";
 import { BeforeEndHandler } from "./services/xtpoints/BeforeEndHandler";
@@ -291,7 +290,59 @@ export class Main extends Module {
       "novice-buttons",
       new WidgetXPConfig(SASApiTest, 5001)
     );
+
+    // load in global variables
+    //this.getGlobalVariables();
+    getService(CommFoundHelper).getGlobalVariables();
   }
+
+  getGlobalVariables() {
+    console.log(`Getting Global Variables`);
+    getService(CommFoundHelper).getGlobalVariable("sabreGetCostcenters.sas");
+    getService(CommFoundHelper).getGlobalVariable("sabreGetProjects.sas");
+    getService(CommFoundHelper).getGlobalVariable("sabreGetGroups.sas");
+    getService(CommFoundHelper).getGlobalVariable("sabreGetLodgingLimits.sas");
+    //getService(CommFoundHelper).getFile(file, token);
+  }
+
+  // getGlobalVariable = async (file: string): Promise<any> => {
+  //   console.log(`1: Calling Get a Token`);
+  //   // get token key - wait on the response
+
+  //   try {
+  //     console.log(`2: Inside the try before token`);
+  //     const token = await getService(CommFoundHelper).getSASToken();
+  //     //let next = await token;
+  //     //let token2: string = token.access_token;
+
+  //     console.log(`3: I should have the token ${token}`);
+  //     console.log(`4: Now go and get ${file}`);
+  //     getService(CommFoundHelper).getFile(file, token);
+  //     console.log(`5: after get file`);
+  //   } catch (err) {
+  //     // handle the error properly
+  //     // {"errorCode":"-300","message":"Job timed out before completion"}
+  //     console.log(err);
+  //   } finally {
+  //     console.log(`6: finished`);
+  //     let SASToken = getService(Variables).getGlobal("SASToken");
+  //     console.log(`Global SAS Token: ${SASToken} `);
+  //   }
+
+  //   console.log(`7: ***Outside #1***`);
+  //   // if successful get file
+
+  //   // then get the file
+
+  //   // finally send msg to alert agent
+
+  //   // error handling
+
+  //   //console.log(`Getting Global Variables=${file}`);
+  //   // look into promise / async / await
+
+  //   //console.log(`My token is ${token}`);
+  // };
 
   private showPersist(): void {
     let addRemarkModalOptions = {
