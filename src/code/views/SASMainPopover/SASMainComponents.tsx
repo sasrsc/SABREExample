@@ -11,6 +11,7 @@ import { IntroPopover } from "./IntroPopover";
 import { HotelPassivePopover } from "./HotelPassivePopover";
 import { QueuePrefPopover } from "./QueuePrefPopover";
 import { ProfilePopover } from "./ProfilePopover";
+import { TemplatePopover } from "./TemplatePopover";
 import { PassportDocumentationPopover } from "./PassportDocumentationPopover";
 import { CstErrorForm } from "../cmdHelper/custom/CstErrorForm";
 
@@ -21,6 +22,7 @@ export enum availableForms {
   hotelPassive,
   queuePref,
   profiles,
+  templatePopover,
 }
 
 export interface ComponentsFoundState {
@@ -83,6 +85,15 @@ export class SASMainComponents extends React.Component<
       case availableForms.profiles:
         return (
           <ProfilePopover
+            handleClose={this.closePopovers}
+            navigation={this.renderNavigation()}
+          />
+        );
+      // 1: you adjust 2 fields the case.available.[your component enum version]
+      case availableForms.templatePopover:
+        return (
+          // 2: here add the exact name of the template component (export class) you created
+          <TemplatePopover
             handleClose={this.closePopovers}
             navigation={this.renderNavigation()}
           />
@@ -174,6 +185,21 @@ export class SASMainComponents extends React.Component<
             onClick={this.handleFormChange(availableForms.profiles)}
           >
             <span className="fa fa-users"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.templatePopover
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.templatePopover)}
+          >
+            <span className="fa fa-question"></span>
           </a>
         </li>
       </ul>
