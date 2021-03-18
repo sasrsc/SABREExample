@@ -524,6 +524,8 @@ export class SASAppDispatcher extends React.Component<MyProps, MyState> {
                   <option value="sabreGetPreferredHotels.sas">
                     preferred hotels
                   </option>
+                  <option value="sabreGetPrefNum.sas">pref codes</option>
+                  <option value="sabreGetAgentList.sas">agents</option>
                 </select>
                 <button
                   type="submit"

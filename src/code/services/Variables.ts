@@ -8,13 +8,13 @@ export class Variables extends AbstractService {
   private jsContent = null;
 
   private jsGlobals: any = {
-    costcenters: [],
-    projects: [],
-    groups: [],
-    lodgingLimits: [],
-    preferredHotels: [],
-    prefCodes: [],
-    agentInfo: [],
+    Costcenters: [],
+    Projects: [],
+    Groups: [],
+    LodgingLimits: [],
+    PreferredHotels: [],
+    PrefNum: [],
+    Agents: [],
     managers: [],
     message: "Hello World - About This",
     SASToken: {},

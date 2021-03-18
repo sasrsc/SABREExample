@@ -343,7 +343,7 @@ export class CommFoundHelper extends AbstractService {
 
   //  getSASToken = async (): Promise<string> => {
   //  getFile = async (file, token): Promise<any> => {
-  getFile(file, token) {
+  getFile(file, token, objName) {
     console.log(`Getting ${file} Using SAS Rest API`);
     //**************************************** */
     const url: string =
@@ -362,13 +362,16 @@ export class CommFoundHelper extends AbstractService {
       .then((responseJson) => {
         let returnObj = responseJson;
         let loadinfo = {
+          objName: objName,
           filename: file,
           refreshed: new Date(),
           count: returnObj.length,
           isLoaded: true,
         };
         console.log(loadinfo);
-        getService(Variables).setGlobal(file, returnObj);
+        getService(Variables).setGlobal(objName, returnObj);
+        //console.log(`${objName}=${getService(Variables).getGlobal(objName)}`);
+
         getService(Variables).appendGlobalUniqueVar("uploads", loadinfo);
         console.log(
           `Finished ${file} Processing SAS Rest API with ${returnObj.length} rows...`
@@ -378,6 +381,7 @@ export class CommFoundHelper extends AbstractService {
       .catch((err) => {
         console.log(err);
         let loadinfo = {
+          objName: objName,
           filename: file,
           refreshed: new Date(),
           count: 0,
@@ -391,16 +395,45 @@ export class CommFoundHelper extends AbstractService {
 
   getGlobalVariables() {
     console.log(`Getting Global Variables`);
-    getService(CommFoundHelper).getGlobalVariable("sabreGetCostcenters.sas");
-    getService(CommFoundHelper).getGlobalVariable("sabreGetProjects.sas");
-    getService(CommFoundHelper).getGlobalVariable("sabreGetGroups.sas");
-    getService(CommFoundHelper).getGlobalVariable("sabreGetLodgingLimits.sas");
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetCostcenters.sas",
+      "Costcenters"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetProjects.sas",
+      "Projects"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetGroups.sas",
+      "Groups"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetLodgingLimits.sas",
+      "LodgingLimits"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetPreferredHotels.sas",
+      "PreferredHotels"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetAgentList.sas",
+      "Agents"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetPrefNum.sas",
+      "PrefNum"
+    );
+    getService(CommFoundHelper).getGlobalVariable(
+      "sabreGetManagers.sas",
+      "Managers"
+    );
+
     let loads = getService(Variables).getGlobal("uploads");
     console.log(`Finished Getting Global Variables ${loads}`);
     //getService(CommFoundHelper).getFile(file, token);
   }
 
-  getGlobalVariable = async (file: string): Promise<any> => {
+  getGlobalVariable = async (file: string, objName: string): Promise<any> => {
     console.log(`1: Calling Get a Token`);
     // get token key - wait on the response
     try {
@@ -410,7 +443,7 @@ export class CommFoundHelper extends AbstractService {
       //let token2: string = token.access_token;
       console.log(`3: I should have the token ${token}`);
       console.log(`4: Now go and get ${file}`);
-      getService(CommFoundHelper).getFile(file, token);
+      getService(CommFoundHelper).getFile(file, token, objName);
       console.log(`5: after get file`);
     } catch (err) {
       // handle the error properly

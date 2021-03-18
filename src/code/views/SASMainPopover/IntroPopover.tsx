@@ -94,9 +94,9 @@ export class IntroPopover extends React.Component<
       });
   }
 
-  handleRefreshLoad = (file: string) => (e) => {
+  handleRefreshLoad = (file: string, objName: string) => (e) => {
     // refresh the file
-    getService(CommFoundHelper).getGlobalVariable(file);
+    getService(CommFoundHelper).getGlobalVariable(file, objName);
     this.props.handleClose();
   };
 
@@ -163,7 +163,8 @@ export class IntroPopover extends React.Component<
           <Table striped bordered condensed hover>
             <thead>
               <tr>
-                <th>File</th>
+                <th>Item</th>
+                <th>File Name</th>
                 <th>Date/Time</th>
                 <th>Count</th>
                 <th>Live</th>
@@ -174,20 +175,21 @@ export class IntroPopover extends React.Component<
             <tbody>
               {this.state.loading.map((s) => (
                 <tr key={s.filename}>
+                  <td>{s.objName}</td>
                   <td>{s.filename}</td>
                   <td>{s.lastload}</td>
-                  <td>{s.count}</td>
+                  <td className="rightContent">{s.count.toLocaleString()}</td>
                   <td>{s.aging}</td>
-                  <td>
+                  <td className="centerContent">
                     {s.isLoaded ? (
-                      <span className="fa fa-check"> </span>
+                      <span className="fa fa-check green"> </span>
                     ) : (
-                      <span className="fa fa-times"> </span>
+                      <span className="fa fa-times red"> </span>
                     )}
                   </td>
-                  <td>
+                  <td className="centerContent">
                     <span
-                      onClick={this.handleRefreshLoad(s.filename)}
+                      onClick={this.handleRefreshLoad(s.filename, s.objName)}
                       className="fa fa-sync"
                     ></span>
                   </td>

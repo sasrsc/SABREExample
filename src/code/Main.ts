@@ -296,14 +296,14 @@ export class Main extends Module {
     getService(CommFoundHelper).getGlobalVariables();
   }
 
-  getGlobalVariables() {
-    console.log(`Getting Global Variables`);
-    getService(CommFoundHelper).getGlobalVariable("sabreGetCostcenters.sas");
-    getService(CommFoundHelper).getGlobalVariable("sabreGetProjects.sas");
-    getService(CommFoundHelper).getGlobalVariable("sabreGetGroups.sas");
-    getService(CommFoundHelper).getGlobalVariable("sabreGetLodgingLimits.sas");
-    //getService(CommFoundHelper).getFile(file, token);
-  }
+  // getGlobalVariables() {
+  //   console.log(`Getting Global Variables`);
+  //   getService(CommFoundHelper).getGlobalVariable("sabreGetCostcenters.sas");
+  //   getService(CommFoundHelper).getGlobalVariable("sabreGetProjects.sas");
+  //   getService(CommFoundHelper).getGlobalVariable("sabreGetGroups.sas");
+  //   getService(CommFoundHelper).getGlobalVariable("sabreGetLodgingLimits.sas");
+  //   //getService(CommFoundHelper).getFile(file, token);
+  // }
 
   // getGlobalVariable = async (file: string): Promise<any> => {
   //   console.log(`1: Calling Get a Token`);
