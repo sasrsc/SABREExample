@@ -100,6 +100,10 @@ export class SASUdids extends React.Component<
     commandMessageReservationRs: CommandMessageReservationRs
   ): void {
     var reservation = commandMessageReservationRs["Data"];
+    var stmtinfo = reservation.Passengers.Passenger[0].NameReference;
+    let stmtinfoParsed = this.cfHelper.parseStatementInfo(stmtinfo);
+    console.log(stmtinfoParsed);
+
     var remarks = reservation.Remarks.Remark;
     const invRemarks: any = remarks.filter(function (i) {
       return i.Type === "Invoice";

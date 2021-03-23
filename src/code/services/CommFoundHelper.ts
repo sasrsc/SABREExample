@@ -311,6 +311,38 @@ export class CommFoundHelper extends AbstractService {
     return getService(AgentProfileService);
   }
 
+  parseStatementInfo(stmtInfo: string): void {
+    let parsedObject: any = {};
+    parsedObject.success = false;
+    parsedObject.text = stmtInfo;
+    parsedObject.group = false;
+    parsedObject.vip = false;
+
+    if (stmtInfo !== undefined && stmtInfo !== "") {
+      let re = /^([a-zA-Z]{3})-([a-zA-Z0-9]+)-([a-zA-Z0-9]+)-?(VIP)?-?(GRP)?/;
+
+      let match = re.exec(stmtInfo);
+
+      // SAS-6785-7206 or SAS-6785-7206-VIP or SAS-6785-7206-GRP or SAS-6785-7206-GRPVIP
+
+      if (match) {
+        parsedObject.success = true;
+        parsedObject.fop = match[1];
+        parsedObject.empNo = match[2];
+        parsedObject.costcent = match[3];
+        if (match[4] !== undefined) {
+          parsedObject.vip = true;
+        }
+        if (match[5] !== undefined) {
+          parsedObject.group = true;
+        }
+      }
+    }
+    console.log(parsedObject);
+
+    return parsedObject;
+  }
+
   getSASToken = async (): Promise<string> => {
     //e.preventDefault();
     console.log(`Getting SAS Token`);
