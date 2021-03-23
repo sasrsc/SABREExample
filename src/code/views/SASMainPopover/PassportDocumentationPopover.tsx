@@ -353,12 +353,36 @@ export class PassportDocumentationPopover extends React.Component<
     });
   }
 
-  handleExecute = async (e): Promise<void> => {
+  handleExecute(e): void {
+    e.preventDefault();
+    console.log("will execute");
+
+    let tempList: any = this.state.PassportVisaDocList.map((i) => ({
+      ...i,
+      Type: "Alpha-Coded",
+      Code: "P",
+      Text: this.handleSabreString(i),
+    }));
+
+    console.log(`${tempList}`);
+
+    var remarksFail = this.cfHelper.handleRemarkChanges(tempList);
+    console.log(`Now close the window ${remarksFail}`);
+    this.props.handleClose();
+    this.cfHelper.refreshTripSummary();
+    this.cfHelper.displayGraphicalPnr();
+  }
+  handleExecute2 = async (e): Promise<void> => {
     e.preventDefault();
     console.log("will execute");
 
     const tempList: Array<any> = [...this.state.PassportVisaDocList];
-    let sendRmks: any = [];
+    let sendRmks: any = this.state.PassportVisaDocList;
+    // loop through and get correct text value...
+
+    console.log(tempList);
+    console.log(sendRmks);
+
     // now decide what to do ...
     // any duplicates?
     var isError = await this.handleDuplicates();
@@ -368,7 +392,8 @@ export class PassportDocumentationPopover extends React.Component<
       console.log(` **** STOP ***** `);
     } else {
       console.log(` **** OK ***** `);
-      // now break up the entries into new ones and modify ones...
+
+      //now break up the entries into new ones and modify ones...
       const newentries: any = tempList.filter(function (i) {
         return i.isExisting === false;
       });
@@ -402,7 +427,7 @@ export class PassportDocumentationPopover extends React.Component<
                 ? JSON.stringify(res, null, 2)
                 : res.value,
             });
-            getService(CommFoundHelper).refreshTipSummary();
+            getService(CommFoundHelper).refreshTripSummary();
 
             if (res.errorCode !== undefined && res.errorCode !== null) {
               getService(IAreaService).showBanner(
@@ -456,7 +481,7 @@ export class PassportDocumentationPopover extends React.Component<
                 ? JSON.stringify(res, null, 2)
                 : res.value,
             });
-            getService(CommFoundHelper).refreshTipSummary();
+            getService(CommFoundHelper).refreshTripSummary();
             if (res.errorCode !== undefined && res.errorCode !== null) {
               getService(IAreaService).showBanner(
                 "Error",

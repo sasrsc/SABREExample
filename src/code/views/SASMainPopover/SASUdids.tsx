@@ -240,8 +240,8 @@ export class SASUdids extends React.Component<
       >
         <Form>
           <div key="TP" className="form-row">
-            <div className="form-group col-md-2">Trip Purpose UD1</div>
-            <div className="form-group col-md-9">
+            <div className="form-group col-md-3">Trip Purpose UD1</div>
+            <div className="form-group col-md-8">
               <input
                 name="trippurpose"
                 type="text"
@@ -258,8 +258,8 @@ export class SASUdids extends React.Component<
             </div>
           </div>
           <div key="PT" className="form-row">
-            <div className="form-group col-md-2">Project Task UD3</div>
-            <div className="form-group col-md-9">
+            <div className="form-group col-md-3">Project Task UD3</div>
+            <div className="form-group col-md-8">
               <input
                 name="projecttask"
                 type="text"
@@ -278,10 +278,10 @@ export class SASUdids extends React.Component<
           </div>
 
           <div key="TPC" className="form-row">
-            <div className="form-group col-md-2">
+            <div className="form-group col-md-3">
               Trip Purpose Category UD11
             </div>
-            <div className="form-group col-md-9">
+            <div className="form-group col-md-8">
               <select
                 name="trippurposecat"
                 className="form-control"

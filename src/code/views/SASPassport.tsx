@@ -317,6 +317,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
         sendRmks = this.cfHelper.getXmlPayload("AddRemarkLLSRQ", {
           Remark: () => {
             let strRmk = "";
+            // if Code or Text are blank/undefined then error
             for (let i = 0; i < newentries.length; i++) {
               strRmk = strRmk.concat(
                 this.cfHelper.getXmlPayload("RemarkAlpha", {
@@ -342,7 +343,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
                 ? JSON.stringify(res, null, 2)
                 : res.value,
             });
-            getService(CommFoundHelper).refreshTipSummary();
+            getService(CommFoundHelper).refreshTripSummary();
 
             if (res.errorCode !== undefined && res.errorCode !== null) {
               getService(IAreaService).showBanner(
@@ -371,6 +372,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
           Remark: () => {
             let strRmk = "";
             for (let i = 0; i < modifyentries.length; i++) {
+              // if Id or Code or Text are blank/undefined then error
               strRmk = strRmk.concat(
                 this.cfHelper.getXmlPayload("RemarkModify", {
                   LineNumber: '"' + modifyentries[i].Id + '"',
@@ -396,7 +398,7 @@ export class SASPassport extends React.Component<{}, OwnState> {
                 ? JSON.stringify(res, null, 2)
                 : res.value,
             });
-            getService(CommFoundHelper).refreshTipSummary();
+            getService(CommFoundHelper).refreshTripSummary();
             if (res.errorCode !== undefined && res.errorCode !== null) {
               getService(IAreaService).showBanner(
                 "Error",

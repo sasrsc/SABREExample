@@ -81,7 +81,7 @@ export class ProfilePopover extends React.Component<
 
         console.log(this.state.response);
 
-        getService(CommFoundHelper).refreshTipSummary();
+        getService(CommFoundHelper).refreshTripSummary();
 
         if (res.errorCode !== undefined && res.errorCode !== null) {
           getService(IAreaService).showBanner(

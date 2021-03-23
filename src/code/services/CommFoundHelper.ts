@@ -299,8 +299,12 @@ export class CommFoundHelper extends AbstractService {
     return getService(IReservationService).getReservation();
   }
 
-  refreshTipSummary(): void {
+  refreshTripSummary(): void {
     getService(PnrPublicService).refreshData();
+  }
+
+  displayGraphicalPnr(): void {
+    getService(PnrPublicService).displayGraphicalPnr();
   }
 
   getAgentProfileService(): AgentProfileService {
@@ -548,6 +552,7 @@ export class CommFoundHelper extends AbstractService {
         Remark: () => {
           let strRmk = "";
           for (let i = 0; i < newRemarks.length; i++) {
+            // if Code or Text are blank/undefined then error
             if (newRemarks[i].Type === "Alpha-Coded") {
               strRmk = strRmk.concat(
                 getService(CommFoundHelper).getXmlPayload("RemarkAlpha", {
@@ -575,7 +580,7 @@ export class CommFoundHelper extends AbstractService {
           authTokenType: "SESSION",
         })
         .then((res) => {
-          getService(CommFoundHelper).refreshTipSummary();
+          getService(CommFoundHelper).refreshTripSummary();
 
           if (res.errorCode !== undefined && res.errorCode !== null) {
             isErroronSend = true;
@@ -604,6 +609,7 @@ export class CommFoundHelper extends AbstractService {
           let strRmk = "";
           for (let i = 0; i < modifiedRemarks.length; i++) {
             if (modifiedRemarks[i].Type === "Alpha-Coded") {
+              // if Id or Code or Text are blank/undefined then error
               strRmk = strRmk.concat(
                 getService(CommFoundHelper).getXmlPayload("RemarkModify", {
                   LineNumber: '"' + modifiedRemarks[i].Id + '"',
@@ -635,7 +641,7 @@ export class CommFoundHelper extends AbstractService {
           authTokenType: "SESSION",
         })
         .then((res) => {
-          getService(CommFoundHelper).refreshTipSummary();
+          getService(CommFoundHelper).refreshTripSummary();
           if (res.errorCode !== undefined && res.errorCode !== null) {
             isErroronSend = true;
             getService(IAreaService).showBanner(
