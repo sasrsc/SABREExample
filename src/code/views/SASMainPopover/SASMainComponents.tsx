@@ -13,6 +13,7 @@ import { QueuePrefPopover } from "./QueuePrefPopover";
 import { ProfilePopover } from "./ProfilePopover";
 import { TemplatePopover } from "./TemplatePopover";
 import { PassportDocumentationPopover } from "./PassportDocumentationPopover";
+import { SASUdids } from "./SASUdids";
 import { CstErrorForm } from "../cmdHelper/custom/CstErrorForm";
 
 const eventBus: AbstractModel = new AbstractModel();
@@ -23,6 +24,7 @@ export enum availableForms {
   queuePref,
   profiles,
   templatePopover,
+  sasudids,
 }
 
 export interface ComponentsFoundState {
@@ -85,6 +87,13 @@ export class SASMainComponents extends React.Component<
       case availableForms.profiles:
         return (
           <ProfilePopover
+            handleClose={this.closePopovers}
+            navigation={this.renderNavigation()}
+          />
+        );
+      case availableForms.sasudids:
+        return (
+          <SASUdids
             handleClose={this.closePopovers}
             navigation={this.renderNavigation()}
           />
@@ -185,6 +194,21 @@ export class SASMainComponents extends React.Component<
             onClick={this.handleFormChange(availableForms.profiles)}
           >
             <span className="fa fa-users"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.sasudids
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.sasudids)}
+          >
+            <span className="fa fa-question"></span>
           </a>
         </li>
         <li

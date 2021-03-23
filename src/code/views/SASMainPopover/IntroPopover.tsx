@@ -173,12 +173,18 @@ export class IntroPopover extends React.Component<
               </tr>
             </thead>
             <tbody>
-              {this.state.loading.map((s) => (
-                <tr key={s.filename}>
+              {this.state.loading.map((s, index) => (
+                <tr key={s.index}>
                   <td>{s.objName}</td>
                   <td>{s.filename}</td>
                   <td>{s.lastload}</td>
-                  <td className="rightContent">{s.count.toLocaleString()}</td>
+                  {/* <td className="rightContent">{s.count}</td> */}
+                  {/* <td className="rightContent">{s.count.toLocaleString()}</td> */}
+                  {s.count >= 0 ? (
+                    <td className="rightContent">{s.count.toLocaleString()}</td>
+                  ) : (
+                    <td>n/a</td>
+                  )}
                   <td>{s.aging}</td>
                   <td className="centerContent">
                     {s.isLoaded ? (

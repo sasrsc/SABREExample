@@ -10,6 +10,7 @@ import { ISoapApiService } from "sabre-ngv-communication/interfaces/ISoapApiServ
 import { SoapRs } from "sabre-ngv-communication/interfaces/SoapRs";
 import { SoapRq } from "sabre-ngv-communication/interfaces/SoapRq";
 
+import { IAreaService } from "sabre-ngv-app/app/services/impl/IAreaService";
 import { RestApiService } from "sabre-ngv-communication/services/RestApiService";
 import { RestResponse } from "sabre-ngv-communication/interfaces/RestResponse";
 import { RestRq } from "sabre-ngv-communication/interfaces/RestRq";
@@ -109,6 +110,9 @@ export class CommFoundHelper extends AbstractService {
       "</Text>" +
       "</Remark>",
 
+    RemarkInvoice:
+      '<Remark Type="Invoice">' + "<Text>" + "{Text}" + "</Text>" + "</Remark>",
+
     ModifyRemarkLLSRQ:
       '<ModifyRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.2">' +
       "<RemarkInfo>{Remark}" +
@@ -122,6 +126,12 @@ export class CommFoundHelper extends AbstractService {
       "</Text>" +
       "</Remark>",
 
+    RemarkModifyInvoice:
+      '<Remark Number={LineNumber} Type="Invoice">' +
+      "<Text>" +
+      "{Text}" +
+      "</Text>" +
+      "</Remark>",
     DeleteRemark:
       '<ModifyRemarkRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" Version="2.1.2">' +
       "<RemarkInfo><Remark Number={LineNumber} />" +
@@ -466,5 +476,222 @@ export class CommFoundHelper extends AbstractService {
     // look into promise / async / await
 
     //console.log(`My token is ${token}`);
+  };
+
+  handleDuplicates(remarkArray: Array<any>) {
+    const theRemarks: Array<any> = remarkArray;
+    let duplicates = "";
+    let isError: boolean = false;
+    console.log(`***searching for duplicates****`);
+
+    theRemarks.forEach((i) => {
+      /* loop through all the items in the existing list....
+         how many times does the same destination exist already? it should appear only once "as itself"
+      */
+      // temp var to store the country we are searching for...
+      let rmkCode = i.Code;
+      let rmkText = i.Text;
+      let rmkType = i.Type;
+      // search the array to see how many times it exists
+      const sameRemarks: any = theRemarks.filter(function (i) {
+        return i.Code === rmkCode && i.Text === rmkText && i.Type === rmkType;
+      });
+      console.log(
+        `${sameRemarks.length} entries found for ${rmkCode} ${rmkText}`
+      );
+      // if it appears more than once (itself) then alert
+      if (sameRemarks.length > 1) {
+        duplicates = duplicates.concat(", ", rmkCode, rmkText);
+      }
+
+      if (duplicates != "") {
+        console.log(` STOP: Multiple entries ${duplicates}`);
+        isError = true;
+      } else {
+        isError = false;
+      }
+      return [isError, duplicates];
+    });
+  }
+
+  handleRemarkChanges(remarkArray: []) {
+    // **************************************************************
+    // You must pass in an array containing objects that include ...
+    // 1: Type (Alpha-Coded vs. Invoice)
+    // 2: Code (letter needed for Alpha Coded)
+    // 3: Text (the value of the entire line to be entered)
+    // 4: isExisting (boolean)
+    // 5: isChange (boolean)
+    // 6: Id (number of the existing line)
+    // **************************************************************
+    console.log(`${remarkArray.length} items to process`);
+    console.log(remarkArray);
+
+    let theRemarks: Array<any> = remarkArray;
+    let newRemarks: Array<any>;
+    let modifiedRemarks: Array<any>;
+    let xmlstr: string;
+    let isErroronSend: boolean = false;
+
+    // any duplicates?
+    // var DuplicateCheck = getService(CommFoundHelper).handleDuplicates(
+    //   theRemarks
+    // );
+    // console.log(DuplicateCheck);
+
+    newRemarks = theRemarks.filter(function (i) {
+      return i.isExisting === false;
+    });
+    if (newRemarks.length > 0) {
+      console.log(`There are ${newRemarks.length} that must be added`);
+      xmlstr = getService(CommFoundHelper).getXmlPayload("AddRemarkLLSRQ", {
+        Remark: () => {
+          let strRmk = "";
+          for (let i = 0; i < newRemarks.length; i++) {
+            if (newRemarks[i].Type === "Alpha-Coded") {
+              strRmk = strRmk.concat(
+                getService(CommFoundHelper).getXmlPayload("RemarkAlpha", {
+                  Code: newRemarks[i].Code,
+                  Text: newRemarks[i].Text,
+                })
+              );
+            } else if (newRemarks[i].Type === "Invoice") {
+              strRmk = strRmk.concat(
+                getService(CommFoundHelper).getXmlPayload("RemarkInvoice", {
+                  Text: newRemarks[i].Text,
+                })
+              );
+            }
+          }
+          return strRmk;
+        },
+      });
+      console.log(xmlstr);
+
+      getService(CommFoundHelper)
+        .sendSWSRequest({
+          action: "AddRemarkLLSRQ",
+          payload: xmlstr,
+          authTokenType: "SESSION",
+        })
+        .then((res) => {
+          getService(CommFoundHelper).refreshTipSummary();
+
+          if (res.errorCode !== undefined && res.errorCode !== null) {
+            isErroronSend = true;
+            getService(IAreaService).showBanner(
+              "Error",
+              "Failed: ".concat(res.errorCode),
+              "***Remark Utility***"
+            );
+          } else {
+            getService(IAreaService).showBanner(
+              "Success",
+              "Added",
+              "***Remark Utility***"
+            );
+          }
+        });
+    }
+    modifiedRemarks = theRemarks.filter(function (i) {
+      return i.isExisting === true && i.isChange === true;
+    });
+    if (modifiedRemarks.length > 0) {
+      console.log(`There are ${modifiedRemarks.length} that must be modified`);
+
+      xmlstr = getService(CommFoundHelper).getXmlPayload("ModifyRemarkLLSRQ", {
+        Remark: () => {
+          let strRmk = "";
+          for (let i = 0; i < modifiedRemarks.length; i++) {
+            if (modifiedRemarks[i].Type === "Alpha-Coded") {
+              strRmk = strRmk.concat(
+                getService(CommFoundHelper).getXmlPayload("RemarkModify", {
+                  LineNumber: '"' + modifiedRemarks[i].Id + '"',
+                  Code: modifiedRemarks[i].Code,
+                  Text: modifiedRemarks[i].Text,
+                })
+              );
+            } else if (modifiedRemarks[i].Type === "Invoice") {
+              strRmk = strRmk.concat(
+                getService(CommFoundHelper).getXmlPayload(
+                  "RemarkModifyInvoice",
+                  {
+                    LineNumber: '"' + modifiedRemarks[i].Id + '"',
+                    Text: modifiedRemarks[i].Text,
+                  }
+                )
+              );
+            }
+          }
+          return strRmk;
+        },
+      });
+      console.log(xmlstr);
+
+      getService(CommFoundHelper)
+        .sendSWSRequest({
+          action: "ModifyRemarkLLSRQ",
+          payload: xmlstr,
+          authTokenType: "SESSION",
+        })
+        .then((res) => {
+          getService(CommFoundHelper).refreshTipSummary();
+          if (res.errorCode !== undefined && res.errorCode !== null) {
+            isErroronSend = true;
+            getService(IAreaService).showBanner(
+              "Error",
+              "Failed: ".concat(res.errorCode),
+              "***Remark Utility***"
+            );
+          } else {
+            getService(IAreaService).showBanner(
+              "Success",
+              "Modified",
+              "***Remark Utility***"
+            );
+          }
+        });
+    }
+
+    return isErroronSend;
+  }
+
+  handleFindUdid = (udid: string, remarkArray: any[]) => {
+    // filter as all udids are Invoice Remarks
+    const theRemarks: any[] = remarkArray.filter(function (i) {
+      return i.Type === "Invoice";
+    });
+    let udidObject = {
+      obj: {},
+      udidText: "",
+      isExisting: false,
+      isChange: false,
+      udidPrefix: "S*UD" + udid + " ",
+    };
+    // my regex to find the Udid
+    // let re = /S\*UD([0-9]{1,2})\s(.*)/;
+    let re = new RegExp("^S\\*UD" + udid + "\\s(.*)");
+    // let re = new RegExp("^S\\*UD1\\s(.*)");
+    theRemarks.forEach((i) => {
+      //console.log(i.Text);
+
+      //   //var found = re.exec(element.Text);
+      //   // const match = element.Text.match(re);
+      const match = re.exec(i.Text);
+      //console.log(`${match.length} items found for Udid${udid}!`);
+
+      //   /////using variables and groups
+      //   //let groups = element.Text.match(re).groups;
+
+      if (match) {
+        //console.log(`its a match`);
+        console.log(match);
+        udidObject.obj = i;
+        udidObject.udidText = match[1];
+        udidObject.isExisting = true;
+      }
+    });
+    console.log(`Udid${udid} success=${udidObject.isExisting}`);
+    return udidObject;
   };
 }
