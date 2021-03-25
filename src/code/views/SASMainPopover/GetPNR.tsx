@@ -16,6 +16,11 @@ export interface TemplatePopoverProps {
   navigation?: JSX.Element;
 }
 
+export class AcLine {
+  AirlineDesignator: string;
+  DocumentNumber: string;
+}
+
 export interface TemplatePopoverState {
   // just samples
   actionCode: string;
@@ -26,6 +31,7 @@ export interface TemplatePopoverState {
   shouldParse: boolean;
   pnr: any;
   pnrraw: any;
+  AcLines: Array<AcLine>;
 }
 
 export class GetPNR extends React.Component<
@@ -49,6 +55,7 @@ export class GetPNR extends React.Component<
     pnr: {},
     pnrraw: {},
     responseStr: "",
+    AcLines: [],
   };
   cfHelper: CommFoundHelper = getService(CommFoundHelper);
 
@@ -83,15 +90,25 @@ export class GetPNR extends React.Component<
           .childNodes;
         console.log(aclines);
         console.log(`There are ${aclines.length} AC Lines in this PNR`);
+        let acs: any = [];
+        let acline = new AcLine();
         aclines.forEach((i) => {
           console.log(i);
+          let acline = new AcLine();
           // this will get the airline for the ac line
-          let airline = i.getElementsByTagName(["stl19:AirlineDesignator"])[0]
-            .childNodes[0].nodeValue;
-          let doc = i.getElementsByTagName(["stl19:DocumentNumber"])[0]
-            .childNodes[0].nodeValue;
-          console.log(`${airline}-${doc}`);
+          acline.AirlineDesignator = i.getElementsByTagName([
+            "stl19:AirlineDesignator",
+          ])[0].childNodes[0].nodeValue;
+          acline.DocumentNumber = i.getElementsByTagName([
+            "stl19:DocumentNumber",
+          ])[0].childNodes[0].nodeValue;
+          console.log(`${acline}`);
           // need to test multiple ac lines
+          acs.push(acline);
+        });
+        console.log(acs);
+        this.setState({
+          AcLines: acs,
         });
 
         // // placeholder for json version of the xml
