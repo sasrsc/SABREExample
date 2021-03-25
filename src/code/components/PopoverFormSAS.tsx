@@ -1,5 +1,5 @@
 import * as React from "react";
-import { getService } from "../Context";
+import { getService, context } from "../Context";
 //import { availableForms, OwnState } from "./CommFoundComponents";
 import { LayerService } from "sabre-ngv-core/services/LayerService";
 
@@ -16,11 +16,14 @@ export class PopoverFormSAS extends React.Component<PopoverFormProps, {}> {
   }
 
   render(): JSX.Element {
+    let imgStyle =
+      context.getModule().getManifest().url + "/assets/saslogomidnight.png";
+
     return (
       <div className="com-sabre-example-redapp-web-module">
         <div className="popover-wrapper">
           <header>
-            <img src="com-sabre-example-redapp-web-module/assets/saslogomidnight.png" />
+            <img src={imgStyle} />
             <h3>{this.props.title}</h3>
           </header>
           <aside>{this.props.navigation}</aside>
