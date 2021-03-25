@@ -3,7 +3,7 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { InputGroup } from "../../components/InputGroup";
 import { Payload } from "../../components/Payload";
-import { PopoverForm } from "../../components/PopoverForm";
+import { PopoverFormSAS } from "../../components/PopoverFormSAS";
 import { getService } from "../../Context";
 import { CommFoundHelper } from "../../services/CommFoundHelper";
 import { XmlTools } from "../../util/XmlTools";
@@ -492,9 +492,9 @@ export class HotelPassivePopover extends React.Component<
     }
 
     return (
-      <PopoverForm
+      <PopoverFormSAS
         name=""
-        title=""
+        title="Manual Hotels"
         content={null}
         buttons={this.renderButtons()}
         navigation={this.props.navigation}
@@ -680,7 +680,7 @@ export class HotelPassivePopover extends React.Component<
             </div>
           </div>
         </form>
-      </PopoverForm>
+      </PopoverFormSAS>
     );
   }
 }

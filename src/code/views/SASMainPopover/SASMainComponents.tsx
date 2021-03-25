@@ -14,6 +14,7 @@ import { ProfilePopover } from "./ProfilePopover";
 import { TemplatePopover } from "./TemplatePopover";
 import { PassportDocumentationPopover } from "./PassportDocumentationPopover";
 import { SASUdids } from "./SASUdids";
+import { GetPNR } from "./GetPNR";
 import { CstErrorForm } from "../cmdHelper/custom/CstErrorForm";
 
 const eventBus: AbstractModel = new AbstractModel();
@@ -25,6 +26,7 @@ export enum availableForms {
   profiles,
   templatePopover,
   sasudids,
+  getpnr,
 }
 
 export interface ComponentsFoundState {
@@ -98,6 +100,14 @@ export class SASMainComponents extends React.Component<
             navigation={this.renderNavigation()}
           />
         );
+      case availableForms.getpnr:
+        return (
+          <GetPNR
+            handleClose={this.closePopovers}
+            navigation={this.renderNavigation()}
+          />
+        );
+
       // 1: you adjust 2 fields the case.available.[your component enum version]
       case availableForms.templatePopover:
         return (
@@ -208,7 +218,22 @@ export class SASMainComponents extends React.Component<
             className="tab"
             onClick={this.handleFormChange(availableForms.sasudids)}
           >
-            <span className="fa fa-question"></span>
+            <span className="fa fa-id-badge"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.getpnr
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.getpnr)}
+          >
+            <span className="fa fa-bug"></span>
           </a>
         </li>
         <li

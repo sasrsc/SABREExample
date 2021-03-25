@@ -1,5 +1,9 @@
 import * as React from "react";
 import { Button } from "../../components/Button";
+import { Input } from "../../components/Input";
+import { Select } from "../../components/Select";
+import { IAreaService } from "sabre-ngv-app/app/services/impl/IAreaService";
+
 import {
   Col,
   ControlLabel,
@@ -52,6 +56,14 @@ export interface TemplatePopoverState {
   groupid: string;
   costcenter: string;
   thisRemarks: any;
+  empno: string;
+  costcent: string;
+  fop: string;
+  vip: string;
+  grp: string;
+  superpnr: string;
+  superpnrobj: any;
+  stmtInfo: any;
 }
 
 export class SASUdids extends React.Component<
@@ -82,6 +94,14 @@ export class SASUdids extends React.Component<
     groupid: "",
     costcenter: "",
     thisRemarks: [],
+    empno: "",
+    costcent: "",
+    fop: "",
+    vip: "",
+    grp: "",
+    superpnr: "",
+    superpnrobj: {},
+    stmtInfo: {},
   };
 
   componentDidMount() {
@@ -103,6 +123,14 @@ export class SASUdids extends React.Component<
     var stmtinfo = reservation.Passengers.Passenger[0].NameReference;
     let stmtinfoParsed = this.cfHelper.parseStatementInfo(stmtinfo);
     console.log(stmtinfoParsed);
+    this.setState({
+      stmtInfo: stmtinfoParsed,
+      fop: stmtinfoParsed.fop,
+      empno: stmtinfoParsed.empno,
+      costcent: stmtinfoParsed.costcent,
+      vip: stmtinfoParsed.vip,
+      grp: stmtinfoParsed.group,
+    });
 
     var remarks = reservation.Remarks.Remark;
     const invRemarks: any = remarks.filter(function (i) {
@@ -135,6 +163,13 @@ export class SASUdids extends React.Component<
       //   this.setState({ trippurposecat: ud11.udidText });
     }
     this.setState({ trippurposecatobj: ud11 });
+
+    // *********** Super PNR UD6 ****************
+    let ud6: any = this.cfHelper.handleFindUdid("6", remarks);
+    if (ud6.isExisting === true) {
+      this.setState({ superpnr: ud6.udidText });
+    }
+    this.setState({ superpnrobj: ud6 });
   }
 
   //   handleDelete(item: string, e):void {
@@ -208,13 +243,97 @@ export class SASUdids extends React.Component<
       };
       toSend.push(tpc);
     }
+    if (this.state.superpnr !== this.state.superpnrobj.udidText) {
+      console.log(`Super PNR has changed`);
+      let tpc = {
+        Type: "Invoice",
+        Text: this.state.superpnrobj.udidPrefix + this.state.superpnr,
+        isExisting: this.state.superpnrobj.isExisting,
+        isChange: true,
+        Id: this.state.superpnrobj.obj.Id,
+      };
+      toSend.push(tpc);
+    }
 
     console.log(toSend);
 
     var remarksFail = this.cfHelper.handleRemarkChanges(toSend);
     console.log(`Now close the window ${remarksFail}`);
 
-    this.props.handleClose();
+    // handle the stmt info if anything has changed...
+    if (
+      this.state.fop !== this.state.stmtInfo.fop ||
+      this.state.empno !== this.state.stmtInfo.empno ||
+      this.state.costcent !== this.state.stmtInfo.costcent ||
+      this.state.vip !== this.state.stmtInfo.vip ||
+      this.state.grp !== this.state.stmtInfo.group
+    ) {
+      // update stmt info
+      console.log(`Stmt Info has changed!`);
+      var sendToSabre = this.cfHelper.getXmlPayload("PassengerDetailsRQ", {
+        TravelItineraryAddInfoRQ: this.cfHelper.getXmlPayload(
+          "TravelItineraryAddInfoRQ",
+          {
+            CustomerInfo: this.cfHelper.getXmlPayload("CustomerInfo", {
+              PersonName: this.cfHelper.getXmlPayload("StmtInfo", {
+                FOP: this.state.fop,
+                Emp: this.state.empno,
+                CC:
+                  this.state.vip === "VIP" || this.state.grp === "GRP"
+                    ? this.state.costcent + "-"
+                    : this.state.costcent,
+                VIP: this.state.vip,
+                GRP: this.state.grp,
+              }), // of person name
+            }), // end of customer info
+          }
+        ), // end of TravelItineraryAddInfoRQ
+      }); // end of PassengerDetailsRQ
+      console.log(sendToSabre);
+
+      // now send it (don't know if this works - have asked sabre)
+
+      getService(CommFoundHelper)
+        .sendSWSRequest({
+          action: "PassengerDetailsRQ",
+          payload: sendToSabre,
+          authTokenType: "SESSION",
+        })
+        .then((res) => {
+          this.setState({
+            response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
+          });
+
+          console.log(res);
+
+          if (res.errorCode !== undefined && res.errorCode !== null) {
+            getService(IAreaService).showBanner(
+              "Error",
+              "Failed: ".concat(res.errorCode),
+              "Stmt Info"
+            );
+          } else {
+            getService(IAreaService).showBanner(
+              "Success",
+              `Updated`,
+              "Stmt Info"
+            );
+            getService(CommFoundHelper).refreshTripSummary();
+            getService(CommFoundHelper).displayGraphicalPnr();
+          }
+        });
+
+      // getService(CommFoundHelper).sendAndHandleSWSRequest(
+      //   //SoapRq,
+      //   "PassengerDetailsRQ",
+      //   sendToSabre,
+      //   "Stmt Info",
+      //   true,
+      //   true,
+      //   true
+      // );
+      this.props.handleClose();
+    }
   }
 
   renderButtons(): JSX.Element[] {
@@ -243,13 +362,86 @@ export class SASUdids extends React.Component<
         navigation={this.props.navigation}
       >
         <Form>
+          <div key="StmtInfo" className="form-row">
+            <div className="form-group col-md-2">
+              <label htmlFor="fop" className="form-label">
+                FOP
+              </label>
+              <select
+                name="fop"
+                className="form-control"
+                value={this.state.fop}
+                onChange={this.handleChange}
+              >
+                <option value="SAS">SAS</option>
+                <option value="IDS">IDS</option>
+                <option value="FOP">FOP</option>
+              </select>
+            </div>
+            <div className="form-group col-md-2">
+              <label htmlFor="empno" className="form-label">
+                Emp #
+              </label>
+              <input
+                type="text"
+                required
+                name="empno"
+                className="form-control text-uppercase"
+                value={this.state.empno}
+                onChange={this.handleChange}
+              />
+            </div>
+            <div className="form-group col-md-2">
+              <label htmlFor="costcent" className="form-label">
+                Costcent
+              </label>
+              <input
+                type="text"
+                required
+                name="costcent"
+                className="form-control text-uppercase"
+                value={this.state.costcent}
+                onChange={this.handleChange}
+              />
+            </div>
+            <div className="form-group col-md-2">
+              <label htmlFor="vip" className="form-label">
+                VIP
+              </label>
+              <select
+                name="vip"
+                className="form-control"
+                value={this.state.vip}
+                onChange={this.handleChange}
+              >
+                <option value="">No</option>
+                <option value="VIP">Yes</option>
+              </select>
+            </div>
+            <div className="form-group col-md-2">
+              <label htmlFor="grp" className="form-label">
+                Group
+              </label>
+              <select
+                name="grp"
+                className="form-control"
+                value={this.state.grp}
+                onChange={this.handleChange}
+              >
+                <option value="">No</option>
+                <option value="GRP">Yes</option>
+              </select>
+            </div>
+          </div>
           <div key="TP" className="form-row">
             <div className="form-group col-md-3">Trip Purpose UD1</div>
             <div className="form-group col-md-8">
               <input
                 name="trippurpose"
                 type="text"
+                required
                 className="form-control"
+                maxLength={63}
                 value={this.state.trippurpose}
                 onChange={this.handleChange}
               />
@@ -289,8 +481,9 @@ export class SASUdids extends React.Component<
               <select
                 name="trippurposecat"
                 className="form-control"
+                required
                 value={this.state.trippurposecat}
-                onChange={this.handleChange.bind(this)}
+                onChange={this.handleChange}
               >
                 <option value="">Choose</option>
                 <option value="CUSTOMER TRAVEL NON PROJECT">
@@ -312,6 +505,26 @@ export class SASUdids extends React.Component<
                   Internal Projects and Deliverables
                 </option>
               </select>
+            </div>
+          </div>
+          <div key="SuperPnr" className="form-row">
+            <div className="form-group col-md-3">Super PNR UD6</div>
+            <div className="form-group col-md-8">
+              <input
+                name="superpnr"
+                type="text"
+                maxLength={63}
+                className="form-control"
+                value={this.state.superpnr}
+                onChange={this.handleChange}
+              />
+            </div>
+            <div className="form-group col-md-1">
+              <i
+                className="fa fa-trash-alt"
+                onClick={() => this.handleDelete("superpnr")}
+                //onClick={this.handleDelete("projecttask")}
+              />
             </div>
           </div>
         </Form>

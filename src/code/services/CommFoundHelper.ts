@@ -40,6 +40,16 @@ export class CommFoundHelper extends AbstractService {
       "<Surname>{Surname}</Surname>" +
       "</PersonName>",
 
+    PersonNameSas:
+      '<PersonName NameReference="{FOP}-{Emp}-{CC}{VIP}{GRP}">' +
+      "<GivenName>{GivenName}</GivenName>" +
+      "<Surname>{Surname}</Surname>" +
+      "</PersonName>",
+
+    StmtInfo:
+      '<PersonName NameReference="{FOP}-{Emp}-{CC}{VIP}{GRP}">' +
+      "</PersonName>",
+
     ContactNumber:
       '<ContactNumber LocationCode="FSG" NameNumber="1.1" Phone="817-555-1212" PhoneUseType="H"/>',
 
@@ -190,6 +200,21 @@ export class CommFoundHelper extends AbstractService {
       "{Destination}¥/NA-{Nationality}/P-{PassportRequired}/V-{VisaRequired}/PS-{PassportStatus}/VS-{VisaStatus}/PD-{PrimaryDocument}/EXP-{ExpiresSoon}/D-{DocumentType}" +
       "</Text>" +
       "</Remark>",
+
+    GetReservationRQ:
+      '<GetReservationRQ xmlns="http://webservices.sabre.com/pnrbuilder/v1_19" Version="1.19.0" EchoToken="">' +
+      "<RequestType>Stateful</RequestType>" +
+      "</GetReservationRQ>",
+
+    GetAccountingLinesRQ:
+      '<GetReservationRQ xmlns="http://webservices.sabre.com/pnrbuilder/v1_19" Version="1.19.0" EchoToken="">' +
+      "<RequestType>Stateful</RequestType>" +
+      '<ReturnOptions UnmaskCreditCard="false" ShowTicketStatus="false" Language="EN" PriceQuoteServiceVersion="3.0.0" IncludePaymentCardToken="false">' +
+      "<SubjectAreas>" +
+      "<SubjectArea>ACCOUNTING_LINE</SubjectArea>" +
+      "</SubjectAreas>" +
+      "</ReturnOptions>" +
+      "</GetReservationRQ>",
   };
 
   getXmlPayload(name: string, values: any): string {
@@ -262,6 +287,52 @@ export class CommFoundHelper extends AbstractService {
     return iSWSService.callSws(request);
   }
 
+  sendAndHandleSWSRequest(
+    //request: SoapRq,
+    //request: SoapRq,
+    action: string,
+    payload: string,
+    bannerText: string,
+    refreshTrip: boolean,
+    displayGraphicalPnr: boolean,
+    closePopover: boolean
+  ): void {
+    // copy of alex's original SWSRequest
+    getService(CommFoundHelper)
+      .sendSWSRequest({
+        action: action,
+        payload: payload,
+        authTokenType: "SESSION",
+      })
+      .then((res) => {
+        console.log(res);
+
+        if (res.errorCode !== undefined && res.errorCode !== null) {
+          getService(IAreaService).showBanner(
+            "Error",
+            "Failed: ".concat(res.errorCode),
+            bannerText
+          );
+        } else {
+          getService(IAreaService).showBanner(
+            "Success",
+            `Request Processed`,
+            bannerText
+          );
+        }
+
+        if (refreshTrip === true) {
+          getService(CommFoundHelper).refreshTripSummary;
+        }
+        if (displayGraphicalPnr === true) {
+          getService(CommFoundHelper).displayGraphicalPnr;
+        }
+        // if (closePopover === true) {
+        //   this.props.handleClose();
+        // }
+      });
+  }
+
   /*
    * Helper method to consume RestApiService
    * Helper method to consume REST/JSON Sabre APIs
@@ -311,12 +382,15 @@ export class CommFoundHelper extends AbstractService {
     return getService(AgentProfileService);
   }
 
-  parseStatementInfo(stmtInfo: string): void {
+  parseStatementInfo(stmtInfo: string) {
     let parsedObject: any = {};
     parsedObject.success = false;
     parsedObject.text = stmtInfo;
-    parsedObject.group = false;
-    parsedObject.vip = false;
+    parsedObject.group = "";
+    parsedObject.vip = "";
+    parsedObject.empno = "";
+    parsedObject.fop = "";
+    parsedObject.costcent = "";
 
     if (stmtInfo !== undefined && stmtInfo !== "") {
       let re = /^([a-zA-Z]{3})-([a-zA-Z0-9]+)-([a-zA-Z0-9]+)-?(VIP)?-?(GRP)?/;
@@ -327,15 +401,21 @@ export class CommFoundHelper extends AbstractService {
 
       if (match) {
         parsedObject.success = true;
-        parsedObject.fop = match[1];
-        parsedObject.empNo = match[2];
-        parsedObject.costcent = match[3];
-        if (match[4] !== undefined) {
-          parsedObject.vip = true;
-        }
-        if (match[5] !== undefined) {
-          parsedObject.group = true;
-        }
+        match[1] !== undefined ? (parsedObject.fop = match[1]) : "";
+        match[2] !== undefined ? (parsedObject.empno = match[2]) : "";
+        match[3] !== undefined ? (parsedObject.costcent = match[3]) : "";
+        match[4] !== undefined ? (parsedObject.vip = match[4]) : "";
+        match[5] !== undefined ? (parsedObject.group = match[5]) : "";
+
+        // parsedObject.fop = match[1];
+        // parsedObject.empNo = match[2];
+        // parsedObject.costcent = match[3];
+        // if (match[4] !== undefined) {
+        //   parsedObject.vip = true;
+        // }
+        // if (match[5] !== undefined) {
+        //   parsedObject.group = true;
+        // }
       }
     }
     console.log(parsedObject);
