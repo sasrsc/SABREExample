@@ -91,7 +91,7 @@ export class GetPNR extends React.Component<
         console.log(aclines);
         console.log(`There are ${aclines.length} AC Lines in this PNR`);
         let acs: any = [];
-        let acline = new AcLine();
+
         aclines.forEach((i) => {
           console.log(i);
           let acline = new AcLine();
