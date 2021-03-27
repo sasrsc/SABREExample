@@ -13,6 +13,7 @@ import { QueuePrefPopover } from "./QueuePrefPopover";
 import { ProfilePopover } from "./ProfilePopover";
 import { TemplatePopover } from "./TemplatePopover";
 import { PassportDocumentationPopover } from "./PassportDocumentationPopover";
+import { AccountingLinePopover } from "./AccountingLinePopover";
 import { SASUdids } from "./SASUdids";
 import { GetPNR } from "./GetPNR";
 import { CstErrorForm } from "../cmdHelper/custom/CstErrorForm";
@@ -27,6 +28,7 @@ export enum availableForms {
   templatePopover,
   sasudids,
   getpnr,
+  accountingLines,
 }
 
 export interface ComponentsFoundState {
@@ -103,6 +105,13 @@ export class SASMainComponents extends React.Component<
       case availableForms.getpnr:
         return (
           <GetPNR
+            handleClose={this.closePopovers}
+            navigation={this.renderNavigation()}
+          />
+        );
+      case availableForms.accountingLines:
+        return (
+          <AccountingLinePopover
             handleClose={this.closePopovers}
             navigation={this.renderNavigation()}
           />
@@ -219,6 +228,21 @@ export class SASMainComponents extends React.Component<
             onClick={this.handleFormChange(availableForms.sasudids)}
           >
             <span className="fa fa-id-badge"></span>
+          </a>
+        </li>
+        <li
+          className={
+            this.state.currentView == availableForms.accountingLines
+              ? "active"
+              : "xp-context"
+          }
+        >
+          <a
+            href="#"
+            className="tab"
+            onClick={this.handleFormChange(availableForms.accountingLines)}
+          >
+            <span className="fa fa-calculator"></span>
           </a>
         </li>
         <li
