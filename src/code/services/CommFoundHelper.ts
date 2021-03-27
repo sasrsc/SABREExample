@@ -22,6 +22,7 @@ import { PnrPublicService } from "sabre-ngv-app/app/services/impl/PnrPublicServi
 
 import { AgentProfileService } from "sabre-ngv-app/app/services/impl/AgentProfileService";
 import { Variables } from "../services/Variables";
+import { string } from "underscore";
 /*
  * class CommFoundHelper, utiility methods to consume main Communication Foundation APIs
  *
@@ -423,10 +424,81 @@ export class CommFoundHelper extends AbstractService {
     return parsedObject;
   }
 
+  getXmlTagValue(node, targetElem): any {
+    let retValue: string = "";
+
+    if (node.getElementsByTagName(targetElem).length == 0) {
+      // return the empty string
+    } else {
+      retValue = node.getElementsByTagName(targetElem)[0].childNodes[0]
+        .nodeValue;
+    }
+    return retValue;
+  }
+
+  getXmlAttributeValue(node, attributeTarget: string): any {
+    console.log(`searching for ${attributeTarget}`);
+    let retValue = "";
+
+    if (node.getAttribute(attributeTarget) === null) {
+      // return the empty string
+      retValue = "";
+      console.log(`can't find the targetElem ${retValue}`);
+    } else {
+      retValue = node.getAttribute(attributeTarget);
+      console.log(retValue);
+    }
+    return retValue;
+  }
+
   getSASToken = async (): Promise<string> => {
     //e.preventDefault();
     console.log(`Getting SAS Token`);
     let token = getService(Variables).getGlobal("SASToken");
+    let getNewToken = true;
+    if (Object.keys(token).length > 0) {
+      if (Date.now() < token.token_end) {
+        console.log(`Existing token is still good`);
+        getNewToken = false;
+        // return existing token
+        return token.access_token;
+      }
+    }
+    if (getNewToken === true) {
+      const url: string = "https://itviya.sas.com/SASLogon/oauth/token";
+      let returnObj: any = {};
+      return fetch(url, {
+        method: "POST",
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/x-www-form-urlencoded",
+          Authorization: "Basic " + btoa("sas.ec:"),
+        },
+        body:
+          "grant_type=password&response_type=bearer&username=sasrsc&password=H1ke1ntheMtns!",
+      })
+        .then((response) => response.json())
+        .then((responseJson) => {
+          returnObj = responseJson;
+          returnObj["token_start"] = new Date();
+          returnObj["token_end"] = new Date(Date.now() + returnObj.expires_in);
+          console.log(returnObj);
+          //return returnObj;
+          console.log(`Returning SAS Token`);
+          getService(Variables).setGlobal("SASToken", returnObj);
+          return returnObj.access_token;
+          //return returnObj;
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+    }
+  };
+
+  getSASToken2 = async (): Promise<string> => {
+    //e.preventDefault();
+    console.log(`Getting SAS Token using sabreclient id & token`);
+    let token = getService(Variables).getGlobal("SASToken2");
     let getNewToken = true;
     if (Object.keys(token).length > 0) {
       if (Date.now() < token.token_end) {

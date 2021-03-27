@@ -18,6 +18,7 @@ export class Variables extends AbstractService {
     managers: [],
     message: "Hello World - About This",
     SASToken: {},
+    SASToken2: {},
     uploads: [],
   };
 
