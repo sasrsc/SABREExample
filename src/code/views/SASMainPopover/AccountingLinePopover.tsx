@@ -59,6 +59,7 @@ export class AccountingLinePopover extends React.Component<
     this.handleCheck = this.handleCheck.bind(this);
     this.handleAdd = this.handleAdd.bind(this);
     this.handleDelete = this.handleDelete.bind(this);
+    this.handleCalculatedTotal = this.handleCalculatedTotal.bind(this);
   }
 
   state: TemplatePopoverState = {
@@ -220,15 +221,10 @@ export class AccountingLinePopover extends React.Component<
     });
   }
 
-  // const calculateTotal = React.useMemo(
-  //     () =>
-  //         // something to only do totals when base or comm change
-  //         this.state.AccountingLineList.map(item => ({
-  //             ...item,
-  //             Total: item.BaseFare + item.Tax,
-  //         }), [this.state.AccountingLineList]
-
-  //         ))
+  handleCalculatedTotal(base, tax) {
+    let total = parseInt(base) + parseInt(tax);
+    return total.toFixed(2);
+  }
 
   handleExecute(): void {
     console.log(`This is what happens when I hit submit`);
@@ -333,7 +329,7 @@ export class AccountingLinePopover extends React.Component<
                       />
                     </td>
 
-                    <td>{s.BaseFare + s.Tax}</td>
+                    <td>{this.handleCalculatedTotal(s.BaseFare, s.Tax)}</td>
                     <td>
                       <FormControl
                         type="number"
