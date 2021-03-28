@@ -20,6 +20,8 @@ export class Variables extends AbstractService {
     SASToken: {},
     SASToken2: {},
     uploads: [],
+    username: "",
+    password: "",
   };
 
   getFromJson(path: string): any {

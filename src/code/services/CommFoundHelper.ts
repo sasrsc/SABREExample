@@ -207,6 +207,16 @@ export class CommFoundHelper extends AbstractService {
       "<RequestType>Stateful</RequestType>" +
       "</GetReservationRQ>",
 
+    // http://files.developer.sabre.com/drc/servicedoc/AddAccountingLineLLSRQ_v2.0.0_Sample_Payloads.xml
+    // <!-- Add an air accounting line for non interactive electronic ticket with the vendor/product included. -->
+    // <!-- Equivalent Sabre host command: AC/BA/28282828280/0.00/100.00/8.00/ONE/CK 1.1D JOHN/2/D/E-V-ABC123/P-DEF456 -->
+    AddAccountingLineRQ:
+      '<AddAccountingLineRQ xmlns="http://webservices.sabre.com/sabreXML/2011/10" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" TimeStamp="2015-04-09T14:30:00-06:00" Version="2.0.0">' +
+      "<AirAccountingLines>" +
+      "{AccountingLine}" +
+      "</AirAccountingLines>" +
+      "</AddAccountingLineRQ",
+
     GetAccountingLinesRQ:
       '<GetReservationRQ xmlns="http://webservices.sabre.com/pnrbuilder/v1_19" Version="1.19.0" EchoToken="">' +
       "<RequestType>Stateful</RequestType>" +
@@ -466,6 +476,10 @@ export class CommFoundHelper extends AbstractService {
     }
     if (getNewToken === true) {
       const url: string = "https://itviya.sas.com/SASLogon/oauth/token";
+      let username: string = await getService(Variables).getGlobal("username");
+      console.log(`username from await call ${username}`);
+
+      let password: string = await getService(Variables).getGlobal("password");
       let returnObj: any = {};
       return fetch(url, {
         method: "POST",
@@ -475,7 +489,11 @@ export class CommFoundHelper extends AbstractService {
           Authorization: "Basic " + btoa("sas.ec:"),
         },
         body:
-          "grant_type=password&response_type=bearer&username=sasrsc&password=H1ke1ntheMtns!",
+          //          "grant_type=password&response_type=bearer&username=xxxxxx&password=xxxxxxx",
+          "grant_type=password&response_type=bearer&username=" +
+          username +
+          "&password=" +
+          password,
       })
         .then((response) => response.json())
         .then((responseJson) => {
@@ -519,7 +537,7 @@ export class CommFoundHelper extends AbstractService {
           Authorization: "Basic " + btoa("sas.ec:"),
         },
         body:
-          "grant_type=password&response_type=bearer&username=sasrsc&password=H1ke1ntheMtns!",
+          "grant_type=password&response_type=bearer&username=xxxxxx&password=xxxxxxxx",
       })
         .then((response) => response.json())
         .then((responseJson) => {

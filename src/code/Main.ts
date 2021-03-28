@@ -57,6 +57,7 @@ import { LocalStoreHelperService } from "./services/LocalStoreHelperService";
 import { BasicView } from "./views/BasicView";
 import StaticButton from "./views/StaticButton";
 import StaticButtonPersist from "./views/StaticButtonPersist";
+import { SASNetworkLogin } from "./views/SASNetworkLogin";
 
 export class Main extends Module {
   localStore: LocalStore;
@@ -147,7 +148,9 @@ export class Main extends Module {
       new RedAppSidePanelButton("AFTER SELL", "side-panel-button", () =>
         this.showAfterSellPopup()
       ),
-
+      new RedAppSidePanelButton("SAS Login", "side-panel-button", () =>
+        this.showSASNetworkLogin()
+      ),
       new RedAppSidePanelButton("Show hello modal", "btn btn-secondary", () => {
         this.showMyHelloModalWindow();
       }),
@@ -293,7 +296,7 @@ export class Main extends Module {
 
     // load in global variables
     //this.getGlobalVariables();
-    getService(CommFoundHelper).getGlobalVariables();
+    //getService(CommFoundHelper).getGlobalVariables();
   }
 
   // getGlobalVariables() {
@@ -876,6 +879,13 @@ export class Main extends Module {
   }
   private showAfterSellPopup(): void {
     getService(LayerService).showOnLayer(AfterSellPopover, {
+      display: "areaView",
+      position: 33,
+    });
+  }
+
+  private showSASNetworkLogin(): void {
+    getService(LayerService).showOnLayer(SASNetworkLogin, {
       display: "areaView",
       position: 33,
     });

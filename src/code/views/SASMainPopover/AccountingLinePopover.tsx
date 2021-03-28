@@ -184,6 +184,27 @@ export class AccountingLinePopover extends React.Component<
 
   handleDelete = (id: number) => (e): void => {
     console.log(`I clicked on delete`);
+    let doclist = this.state.AccountingLineList;
+    console.log(`**** Delete line ${id} ****`);
+    let itemtodelete: number = null;
+    let isExisting: boolean;
+    doclist.forEach((i, index) => {
+      if (i.Id == id) {
+        itemtodelete = index;
+        isExisting = i.isExisting;
+      }
+    });
+    // remove from our temp list
+    doclist.splice(itemtodelete, 1);
+
+    // update state to reflect the item being removed
+    this.setState({
+      AccountingLineList: doclist,
+    });
+
+    if (isExisting === true) {
+      // need to remove from sabre too
+    }
   };
 
   handleAdd(e): void {
@@ -222,14 +243,17 @@ export class AccountingLinePopover extends React.Component<
   }
 
   handleCalculatedTotal(base, tax) {
-    let total = parseInt(base) + parseInt(tax);
+    let total = parseFloat(base) + parseFloat(tax);
     return total.toFixed(2);
   }
 
   handleExecute(): void {
     console.log(`This is what happens when I hit submit`);
-    // some code
-    console.log(`Now close the window`);
+    // AddAccountingLineLLSRQ
+    // https://developer.sabre.com/docs/soap_apis/management/itinerary/Add_Accounting_Line
+    //files.developer.sabre.com/drc/servicedoc/AddAccountingLineLLSRQ_v2.0.0_Sample_Payloads.xml
+
+    http: console.log(`Now close the window`);
     this.props.handleClose();
   }
 
