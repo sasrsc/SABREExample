@@ -3,6 +3,7 @@ import { Button } from "../../components/Button";
 import { Input } from "../../components/Input";
 import { Select } from "../../components/Select";
 import { IAreaService } from "sabre-ngv-app/app/services/impl/IAreaService";
+import { PnrPublicService } from "sabre-ngv-app/app/services/impl/PnrPublicService";
 
 import {
   Col,
@@ -76,6 +77,7 @@ export class SASUdids extends React.Component<
     this.handleDelete = this.handleDelete.bind(this);
     this.handleExecute = this.handleExecute.bind(this);
     this.handleCheck = this.handleCheck.bind(this);
+    this.handleErase = this.handleErase.bind(this);
   }
 
   state: TemplatePopoverState = {
@@ -104,6 +106,8 @@ export class SASUdids extends React.Component<
     stmtInfo: {},
   };
 
+  cfHelper: CommFoundHelper = getService(CommFoundHelper);
+
   componentDidMount() {
     console.log("Getting PNR Info....");
     let reservationPromise: Promise<CommandMessageReservationRs> = getService(
@@ -114,7 +118,6 @@ export class SASUdids extends React.Component<
       console.log(error);
     });
   }
-  cfHelper: CommFoundHelper = getService(CommFoundHelper);
 
   public getRemarks(
     commandMessageReservationRs: CommandMessageReservationRs
@@ -190,12 +193,64 @@ export class SASUdids extends React.Component<
   }
 
   handleDelete(whichitem: keyof TemplatePopoverState) {
-    // this handles someone changing an input text field
-    // currently they can do this with the tp and pt only
-    console.log(whichitem);
+    // super pnr and proj tast only
+    // 1. this blanks out the value in state
+    // 2. need to delete from pnr if already existed
+    console.log(`Need to erase/delete ${whichitem}`);
+    let handlethisitem = whichitem + "obj";
+
     this.setState(({
       [whichitem]: "",
     } as unknown) as Pick<TemplatePopoverState, keyof TemplatePopoverState>);
+    // but delete from the pnr
+    // pass the line to helper
+    if (this.state[handlethisitem].isExisting === true) {
+      console.log(`${whichitem} is in the PNR so delete.`);
+      let id: string = this.state[handlethisitem].obj.Id;
+      var deleteRmk = this.cfHelper.getXmlPayload("DeleteRemark", {
+        LineNumber: '"' + id + '"',
+      });
+      console.log(deleteRmk);
+
+      // delete the remark in the pnr
+      getService(CommFoundHelper)
+        .sendSWSRequest({
+          action: "ModifyRemarkLLSRQ",
+          payload: deleteRmk,
+          authTokenType: "SESSION",
+        })
+        .then((res) => {
+          this.setState({
+            response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
+          });
+        });
+    } else {
+      console.log(`${whichitem} didn't exist previously so no need to delete.`);
+    }
+    // let id: string = "";
+    // if (whichitem === "projecttask" && this.state.projecttaskobj.isExisting===true) {
+    //   //
+    //   id = this.state.projecttaskobj.obj.Id;
+    // } else if (
+    //   whichitem === "superpnr" &&
+    //   this.state.superpnrobj.isExisting === true
+    // ) {
+    //   //
+    //   id = this.state.superpnrobj.obj.Id;
+    // }
+
+    // create xml to delete the item from the face of the pnr if it was in there in the beginning ...
+  }
+
+  handleErase(whichitem: keyof TemplatePopoverState) {
+    // trip purpose
+    // currently they can do this with the tp and pt only
+    // this blanks out the value in state but NOT delete
+    console.log(`Need to erase ${whichitem} value`);
+    this.setState(({
+      [whichitem]: "",
+    } as unknown) as Pick<TemplatePopoverState, keyof TemplatePopoverState>);
+    // but
   }
 
   handleCheck(e): void {
@@ -209,7 +264,10 @@ export class SASUdids extends React.Component<
     // get each udid's current state and now update each object with that new value
     let toSend: any = [];
 
-    if (this.state.trippurpose !== this.state.trippurposeobj.udidText) {
+    if (
+      this.state.trippurpose !== this.state.trippurposeobj.udidText &&
+      this.state.trippurpose !== ""
+    ) {
       console.log(`Trip Purpose has changed`);
       let tp = {
         Type: "Invoice",
@@ -220,7 +278,10 @@ export class SASUdids extends React.Component<
       };
       toSend.push(tp);
     }
-    if (this.state.projecttask !== this.state.projecttaskobj.udidText) {
+    if (
+      this.state.projecttask !== this.state.projecttaskobj.udidText &&
+      this.state.projecttask !== ""
+    ) {
       console.log(`Project Task has changed`);
       let pt = {
         Type: "Invoice",
@@ -243,7 +304,10 @@ export class SASUdids extends React.Component<
       };
       toSend.push(tpc);
     }
-    if (this.state.superpnr !== this.state.superpnrobj.udidText) {
+    if (
+      this.state.superpnr !== this.state.superpnrobj.udidText &&
+      this.state.superpnr !== ""
+    ) {
       console.log(`Super PNR has changed`);
       let tpc = {
         Type: "Invoice",
@@ -270,70 +334,25 @@ export class SASUdids extends React.Component<
     ) {
       // update stmt info
       console.log(`Stmt Info has changed!`);
-      var sendToSabre = this.cfHelper.getXmlPayload("PassengerDetailsRQ", {
-        TravelItineraryAddInfoRQ: this.cfHelper.getXmlPayload(
-          "TravelItineraryAddInfoRQ",
-          {
-            CustomerInfo: this.cfHelper.getXmlPayload("CustomerInfo", {
-              PersonName: this.cfHelper.getXmlPayload("StmtInfo", {
-                FOP: this.state.fop,
-                Emp: this.state.empno,
-                CC:
-                  this.state.vip === "VIP" || this.state.grp === "GRP"
-                    ? this.state.costcent + "-"
-                    : this.state.costcent,
-                VIP: this.state.vip,
-                GRP: this.state.grp,
-              }), // of person name
-            }), // end of customer info
-          }
-        ), // end of TravelItineraryAddInfoRQ
-      }); // end of PassengerDetailsRQ
-      console.log(sendToSabre);
+      // this has to be done with Native Command per SABRE 4/1/21
+
+      let sendtoSABRE = this.cfHelper.createStatementInfoEntry(
+        this.state.fop,
+        this.state.empno,
+        this.state.costcent,
+        this.state.vip,
+        this.state.grp
+      );
+      this.cfHelper
+        .sendCommandMessage(sendtoSABRE, true, true)
+        .then((res) => {});
 
       // now send it (don't know if this works - have asked sabre)
-
-      getService(CommFoundHelper)
-        .sendSWSRequest({
-          action: "PassengerDetailsRQ",
-          payload: sendToSabre,
-          authTokenType: "SESSION",
-        })
-        .then((res) => {
-          this.setState({
-            response: res.errorCode ? JSON.stringify(res, null, 2) : res.value,
-          });
-
-          console.log(res);
-
-          if (res.errorCode !== undefined && res.errorCode !== null) {
-            getService(IAreaService).showBanner(
-              "Error",
-              "Failed: ".concat(res.errorCode),
-              "Stmt Info"
-            );
-          } else {
-            getService(IAreaService).showBanner(
-              "Success",
-              `Updated`,
-              "Stmt Info"
-            );
-            getService(CommFoundHelper).refreshTripSummary();
-            getService(CommFoundHelper).displayGraphicalPnr();
-          }
-        });
-
-      // getService(CommFoundHelper).sendAndHandleSWSRequest(
-      //   //SoapRq,
-      //   "PassengerDetailsRQ",
-      //   sendToSabre,
-      //   "Stmt Info",
-      //   true,
-      //   true,
-      //   true
-      // );
-      this.props.handleClose();
     }
+    this.cfHelper.refreshTripSummary();
+    this.props.handleClose();
+    //this.cfHelper.displayGraphicalPnr();
+    getService(PnrPublicService).displayGraphicalPnr("itinerary");
   }
 
   renderButtons(): JSX.Element[] {
@@ -448,8 +467,8 @@ export class SASUdids extends React.Component<
             </div>
             <div className="form-group col-md-1">
               <i
-                className="fa fa-trash-alt"
-                onClick={() => this.handleDelete("trippurpose")}
+                className="fa fa-eraser"
+                onClick={() => this.handleErase("trippurpose")}
               />
             </div>
           </div>

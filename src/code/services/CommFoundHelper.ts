@@ -393,6 +393,26 @@ export class CommFoundHelper extends AbstractService {
     return getService(AgentProfileService);
   }
 
+  createStatementInfoEntry(
+    fop: string,
+    empno: string,
+    costcenter: string,
+    vip: string,
+    grp: string
+  ) {
+    let output: string = "-1¤*" + fop + "-" + empno + "-" + costcenter;
+    if (vip === "VIP" || grp === "GRP") {
+      output += "-";
+      if (vip === "VIP") {
+        output += vip;
+      }
+      if (grp === "GRP") {
+        output += grp;
+      }
+    }
+    return output;
+  }
+
   parseStatementInfo(stmtInfo: string) {
     let parsedObject: any = {};
     parsedObject.success = false;
