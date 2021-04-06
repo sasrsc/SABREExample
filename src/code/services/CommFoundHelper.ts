@@ -224,6 +224,8 @@ export class CommFoundHelper extends AbstractService {
       "<SubjectAreas>" +
       "<SubjectArea>ACCOUNTING_LINE</SubjectArea>" +
       "</SubjectAreas>" +
+      "<ViewName>Simple</ViewName>" +
+      "<ResponseFormat>STL</ResponseFormat>" +
       "</ReturnOptions>" +
       "</GetReservationRQ>",
   };

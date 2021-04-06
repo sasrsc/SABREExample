@@ -253,7 +253,7 @@ export class AccountingLinePopover extends React.Component<
     // https://developer.sabre.com/docs/soap_apis/management/itinerary/Add_Accounting_Line
     //files.developer.sabre.com/drc/servicedoc/AddAccountingLineLLSRQ_v2.0.0_Sample_Payloads.xml
 
-    http: console.log(`Now close the window`);
+    //console.log(`Now close the window`);
     this.props.handleClose();
   }
 
