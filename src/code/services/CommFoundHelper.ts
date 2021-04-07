@@ -220,14 +220,39 @@ export class CommFoundHelper extends AbstractService {
     GetAccountingLinesRQ:
       '<GetReservationRQ xmlns="http://webservices.sabre.com/pnrbuilder/v1_19" Version="1.19.0" EchoToken="">' +
       "<RequestType>Stateful</RequestType>" +
-      '<ReturnOptions UnmaskCreditCard="false" ShowTicketStatus="false" Language="EN" PriceQuoteServiceVersion="3.0.0" IncludePaymentCardToken="false">' +
+      '<ReturnOptions UnmaskCreditCard="true" ShowTicketStatus="false" Language="EN" PriceQuoteServiceVersion="3.0.0" IncludePaymentCardToken="false">' +
       "<SubjectAreas>" +
       "<SubjectArea>ACCOUNTING_LINE</SubjectArea>" +
       "</SubjectAreas>" +
-      "<ViewName>Simple</ViewName>" +
+      // "<ViewName>Simple</ViewName>" +
       "<ResponseFormat>STL</ResponseFormat>" +
       "</ReturnOptions>" +
       "</GetReservationRQ>",
+
+    NonInteractiveElectronicTicket:
+      '<NonInteractiveElectronicTicket VendorCode="{Airline}">' +
+      '<FOP_One Type="{FOP}">' +
+      "<CC_Info>" +
+      '<PaymentCard Code="{CreditCardCode}" Number="{CreditCardNumber}"/>' +
+      "</CC_Info>" +
+      "</FOP_One>" +
+      "<ItinTotalFare>" +
+      '<BaseFare Amount="{BaseFare}"/>' +
+      '<Commission Amount="{Commission}"/>' +
+      "<Taxes>" +
+      '<Tax Amount="{Tax}"/>' +
+      "</Taxes>" +
+      "</ItinTotalFare>" +
+      '<PersonName NameNumber="1.1">' +
+      "<GivenName>{FirstInitial}</GivenName>" +
+      "<Surname>{LastName}</Surname>" +
+      "</PersonName>" +
+      '<Ticketing eTicketNumber="{TicketNumber}" NumDocs="1" Tariff="D"/>' +
+      '<Type Info="ONE"/>' +
+      "<VendorPrefs>" +
+      '<Airline Code="{Airline}"/>' +
+      "</VendorPrefs>" +
+      "< /NonInteractiveElectronicTicket>",
   };
 
   getXmlPayload(name: string, values: any): string {
@@ -924,4 +949,22 @@ export class CommFoundHelper extends AbstractService {
     console.log(`Udid${udid} success=${udidObject.isExisting}`);
     return udidObject;
   };
+
+  getPaxArrayFromXml(xml: any): any {
+    let paxArray: any = [];
+    let paxsection: any = xml.getElementsByTagName("stl19:Passengers")[0]
+      .childNodes;
+    let pax: any = {};
+    paxsection.forEach((i) => {
+      (pax.LastName = this.getXmlTagValue(i, ["stl19:LastName"])),
+        (pax.FirstInitial = this.getXmlTagValue(i, ["stl19:FirstName"]).substr(
+          0,
+          1
+        )),
+        (pax.Number = this.getXmlAttributeValue(i, "nameId")),
+        console.log(pax);
+      paxArray.push(pax);
+    });
+    return paxArray;
+  }
 }
