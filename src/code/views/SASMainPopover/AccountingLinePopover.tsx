@@ -49,9 +49,9 @@ export class AcctingLine {
 }
 
 export class ErrorMessage {
-  Message: string;
-  Code: string;
-  Severity: string;
+  Message?: string;
+  Code?: string;
+  Severity?: string;
 }
 
 export interface TemplatePopoverState {
@@ -108,7 +108,7 @@ export class AccountingLinePopover extends React.Component<
   }
 
   private getReservation(): void {
-    console.log("Retrieving Reservation");
+    console.log("Retrieving Reservation ");
     let reservationPromise: Promise<CommandMessageReservationRs> = getService(
       IReservationService
     ).getReservation();
@@ -130,112 +130,134 @@ export class AccountingLinePopover extends React.Component<
         authTokenType: "SESSION",
       })
       .then((res) => {
-        let thexml = res.value;
         const parser = new DOMParser();
+        let thexml = res.value;
         const xml = parser.parseFromString(thexml, "application/xml");
+        // errors would be here if there are any
         let errors: any = xml.getElementsByTagName("stl19:Errors");
+        // now look over the array of errors to find your error information
         if (errors.length > 0) {
-          // some error ...
+          // locate info about the error ...
+          console.log(errors);
           let error = new ErrorMessage();
-          (error.Message = this.cfHelper.getXmlTagValue(errors, [
-            "stl19:Message",
-          ])),
-            (error.Code = this.cfHelper.getXmlTagValue(errors, ["stl19:Code"])),
-            (error.Severity = this.cfHelper.getXmlTagValue(errors, [
-              "stl19:Severity",
-            ])),
-            console.log(error);
-        }
+          error.Message = errors[0].getElementsByTagName(
+            "stl19:Message"
+          )[0].childNodes[0].nodeValue;
+          error.Code = errors[0].getElementsByTagName(
+            "stl19:Code"
+          )[0].childNodes[0].nodeValue;
+          error.Severity = errors[0].getElementsByTagName(
+            "stl19:Severity"
+          )[0].childNodes[0].nodeValue;
+          console.log(error);
 
-        console.log(res);
-
-        // check for messages
-        if (res.errorCode !== undefined && res.errorCode !== null) {
-          console.log(`errors!!!!`);
+          // close the popover
+          this.props.handleClose();
+          // display the error message
+          getService(IAreaService).showBanner(
+            "Error",
+            "Failed: ".concat(error.Message),
+            "Accounting Lines"
+          );
         } else {
+          // so we have a pnr
+          console.log(res);
           let pax = this.cfHelper.getPaxArrayFromXml(xml);
           console.log(pax);
           this.setState({
             paxList: pax,
           });
-          let aclines2: any = xml.getElementsByTagName("stl19:AccountingLines");
-          console.log(aclines2);
+          // do we have existing accounting lines - searching in the root element?
+          let acCount: any = xml.getElementsByTagName("stl19:AccountingLines");
+          console.log(
+            `There are ${acCount.length} accounting lines in the PNR`
+          );
 
-          let aclines: any = xml.getElementsByTagName(
-            "stl19:AccountingLines"
-          )[0].childNodes;
-          console.log(aclines);
-          console.log(`There are ${aclines.length} AC Lines in this PNR`);
-          let acs: any = [];
+          // if we do then display them
+          if (acCount.length > 0) {
+            let aclines: any = xml.getElementsByTagName(
+              "stl19:AccountingLines"
+            )[0].childNodes;
 
-          aclines.forEach((i) => {
-            console.log(i);
-            let acline = new AcctingLine();
-            // this will get the values in the xml for each element in the ac line using helper function
+            console.log(aclines);
 
-            // the index value is the ac line number in sabre ac1, it is needed ...
-            (acline.Id = parseFloat(
-              this.cfHelper.getXmlAttributeValue(i, "index")
-            )),
-              (acline.Airline = this.cfHelper.getXmlTagValue(i, [
-                "stl19:AirlineDesignator",
-              ])),
-              (acline.TicketNumber = this.cfHelper.getXmlTagValue(i, [
-                "stl19:DocumentNumber",
-              ])),
-              (acline.FOP = this.cfHelper.getXmlTagValue(i, [
-                "stl19:FormOfPaymentCode",
-              ])),
-              (acline.LastNameFirstInitial = this.cfHelper.getXmlTagValue(i, [
-                "stl19:PassengerName",
-              ])),
-              // left of the space
-              (acline.LastName = acline.LastNameFirstInitial.substr(
-                0,
-                acline.LastNameFirstInitial.indexOf(" ")
+            console.log(`There are ${aclines.length} AC Lines in this PNR`);
+            let acs: any = [];
+
+            aclines.forEach((i) => {
+              console.log(i);
+              let acline = new AcctingLine();
+              // this will get the values in the xml for each element in the ac line using helper function
+
+              // the index value is the ac line number in sabre ac1, it is needed ...
+              (acline.Id = parseFloat(
+                this.cfHelper.getXmlAttributeValue(i, "index")
               )),
-              // right of the space
-              (acline.FirstInitial = acline.LastNameFirstInitial.substr(
-                acline.LastNameFirstInitial.indexOf(" ") + 1
-              )),
-              (acline.BaseFare = parseFloat(
-                this.cfHelper.getXmlTagValue(i, ["stl19:BaseFare"])
-              )),
-              (acline.Tax = parseFloat(
-                this.cfHelper.getXmlTagValue(i, ["stl19:TaxAmount"])
-              )),
-              (acline.Commission = parseFloat(
-                this.cfHelper.getXmlTagValue(i, ["stl19:CommissionAmount"])
-              )),
-              (acline.FareApplication = this.cfHelper.getXmlTagValue(i, [
-                "stl19:FareApplication",
-              ])),
-              (acline.NumberOfConjunctedDocuments = this.cfHelper.getXmlTagValue(
-                i,
-                ["stl19:NumberOfConjunctedDocuments"]
-              )),
-              (acline.TariffBasis = this.cfHelper.getXmlTagValue(i, [
-                "stl19:TarriffBasis",
-              ])),
-              (acline.CreditCardCode = this.cfHelper.getXmlTagValue(i, [
-                "stl19:CreditCardCode",
-              ])),
-              (acline.CreditCardNumber = this.cfHelper.getXmlTagValue(i, [
-                "stl19:CreditCardNumber",
-              ])),
-              (acline.FreeFormText = this.cfHelper.getXmlTagValue(i, [
-                "stl19:FreeFormText",
-              ])),
-              (acline.isChange = false),
-              (acline.isExisting = true),
-              console.log(`${acline}`);
-            // need to test multiple ac lines
-            acs.push(acline);
-          });
-          console.log(acs);
-          this.setState({
-            AccountingLineList: acs,
-          });
+                (acline.Airline = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:AirlineDesignator",
+                ])),
+                (acline.TicketNumber = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:DocumentNumber",
+                ])),
+                (acline.FOP = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:FormOfPaymentCode",
+                ])),
+                (acline.LastNameFirstInitial = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:PassengerName",
+                ])),
+                // left of the space
+                (acline.LastName = acline.LastNameFirstInitial.substr(
+                  0,
+                  acline.LastNameFirstInitial.indexOf(" ")
+                )),
+                // right of the space
+                (acline.FirstInitial = acline.LastNameFirstInitial.substr(
+                  acline.LastNameFirstInitial.indexOf(" ") + 1
+                )),
+                (acline.BaseFare = parseFloat(
+                  this.cfHelper.getXmlTagValue(i, ["stl19:BaseFare"])
+                )),
+                (acline.Tax = parseFloat(
+                  this.cfHelper.getXmlTagValue(i, ["stl19:TaxAmount"])
+                )),
+                (acline.Commission = parseFloat(
+                  this.cfHelper.getXmlTagValue(i, ["stl19:CommissionAmount"])
+                )),
+                (acline.FareApplication = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:FareApplication",
+                ])),
+                (acline.NumberOfConjunctedDocuments = this.cfHelper.getXmlTagValue(
+                  i,
+                  ["stl19:NumberOfConjunctedDocuments"]
+                )),
+                (acline.TariffBasis = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:TarriffBasis",
+                ])),
+                (acline.CreditCardCode = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:CreditCardCode",
+                ])),
+                (acline.CreditCardNumber = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:CreditCardNumber",
+                ])),
+                (acline.FreeFormText = this.cfHelper.getXmlTagValue(i, [
+                  "stl19:FreeFormText",
+                ])),
+                (acline.isChange = false),
+                (acline.isExisting = true),
+                console.log(`${acline}`);
+              // need to test multiple ac lines
+              acs.push(acline);
+            });
+            console.log(acs);
+            this.setState({
+              AccountingLineList: acs,
+            });
+          } else {
+            // no existing accounting lines so add this one
+            console.log(`Adding blank ac line`);
+
+            this.handleAdd();
+          }
         }
       });
   }
@@ -269,17 +291,23 @@ export class AccountingLinePopover extends React.Component<
   handleCheck = (id: number) => (e): void => {
     // this handles someone clicked on the checkbox
     //this.setState({ [e.target.name]: !this.state[e.target.name] });
-    console.log(`${e.target.name} change to ${e.target.value}`);
-    const target = e.target;
-    const value = target.type === "checkbox" ? target.checked : target.value;
-    const name = target.name;
+
+    // this.setState((prev) => ({
+    //   useCC: prev.useCC.map((val, i) =>
+    //     !val && i === id ? true : val
+    //   ),
+    // }));
+
+    // console.log(`${e.target.name} change to ${e.target.value}`);
+    // const target = e.target;
+    // const value = target.type === "checkbox" ? target.checked : target.value;
+    // const name = target.name;
 
     const doc = this.state.AccountingLineList.map((i) =>
       i.Id == id
         ? {
             ...i,
-            // [e.target.name]: !this.state[e.target.name],
-            name: value,
+            [e.target.name]: !this.state[e.target.name],
             isChange: true,
           }
         : i
@@ -341,7 +369,7 @@ export class AccountingLinePopover extends React.Component<
     }
   };
 
-  handleAdd(e): void {
+  handleAdd(): void {
     let next = this.state.acindex + 1;
     //get the values from the last item in the array to pre populate the new item
 
@@ -541,12 +569,18 @@ export class AccountingLinePopover extends React.Component<
                       />
                     </td>
                     <td>
-                      <FormControl
-                        type="text"
-                        name="FOP"
-                        value={s.FOP}
-                        onChange={this.handleChange(s.Id)}
-                      />
+                      <span
+                        className={
+                          "form-prefremark " + (s.useCC ? "hideit" : "")
+                        }
+                      >
+                        <FormControl
+                          type="text"
+                          name="FOP"
+                          value={s.FOP}
+                          onChange={this.handleChange(s.Id)}
+                        />
+                      </span>
 
                       <input
                         type="checkbox"
