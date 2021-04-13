@@ -58,7 +58,7 @@ export class SASNetworkLogin extends React.Component<OwnProps, OwnState> {
     console.log(`OK, will try and get global variables`);
 
     this.cfHelper.getGlobalVariables();
-    this.closeLayer;
+    this.closeLayer();
   }
 
   renderButtons(): JSX.Element[] {

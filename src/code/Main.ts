@@ -297,6 +297,16 @@ export class Main extends Module {
     // load in global variables
     //this.getGlobalVariables();
     //getService(CommFoundHelper).getGlobalVariables();
+    // getService(LayerService).showInModal(
+    //   new BasicView({ model: new PersistModel(this.localStore) }),
+    //   addRemarkModalOptions,
+    //   { display: "areaView" }
+    // );
+
+    // getService(LayerService).showOnLayer(SASNetworkLogin, {
+    //   display: "areaView",
+    //   position: 33,
+    // });
   }
 
   // getGlobalVariables() {

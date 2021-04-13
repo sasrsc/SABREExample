@@ -37,7 +37,7 @@ export class AcctingLine {
   FirstInitial?: string;
   PaxNumber?: string;
   BaseFare: number;
-  useCC?: boolean;
+  useDefault?: boolean;
   Tax: number;
   Commission: number;
   FareApplication: string;
@@ -46,6 +46,14 @@ export class AcctingLine {
   FreeFormText?: string;
   isChange: boolean;
   isExisting: boolean;
+}
+
+export class Fops {
+  Id: number;
+  Type: "CK" | "CC";
+  CardCode?: string;
+  CardNumber?: string;
+  isPrimary: boolean;
 }
 
 export class ErrorMessage {
@@ -66,6 +74,13 @@ export interface TemplatePopoverState {
   acindex: number;
   show: boolean;
   paxList: any;
+  primaryCreditCardCode: string;
+  primaryCreditCardNumber: string;
+  primaryFop: string;
+  fops: any;
+
+  fopMessage: string;
+  helpMessage: string;
 }
 
 export class AccountingLinePopover extends React.Component<
@@ -82,7 +97,15 @@ export class AccountingLinePopover extends React.Component<
     this.handleCalculatedTotal = this.handleCalculatedTotal.bind(this);
     this.handleDismiss = this.handleDismiss.bind(this);
     this.handleShow = this.handleShow.bind(this);
-    this.getAcLines = this.getAcLines.bind(this);
+    this.getExistingAcLines = this.getExistingAcLines.bind(this);
+    this.getallFops = this.getallFops.bind(this);
+    this.getFormOfPaymentLine = this.getFormOfPaymentLine.bind(this);
+    this.getCreditCardInfoFromAccountingLines = this.getCreditCardInfoFromAccountingLines.bind(
+      this
+    );
+    this.Start2 = this.Start2.bind(this);
+    this.Middle2 = this.Middle2.bind(this);
+    this.End2 = this.End2.bind(this);
   }
 
   state: TemplatePopoverState = {
@@ -97,6 +120,12 @@ export class AccountingLinePopover extends React.Component<
     isSuccess: false,
     show: false,
     paxList: [],
+    primaryCreditCardCode: "",
+    primaryCreditCardNumber: "",
+    primaryFop: "",
+    helpMessage: "",
+    fopMessage: "",
+    fops: [],
   };
 
   cfHelper: CommFoundHelper = getService(CommFoundHelper);
@@ -112,14 +141,151 @@ export class AccountingLinePopover extends React.Component<
     let reservationPromise: Promise<CommandMessageReservationRs> = getService(
       IReservationService
     ).getReservation();
-    reservationPromise.then(this.getAcLines).catch((error) => {
+    // reservationPromise.then(this.getAcLines).catch((error) => {
+    //   console.log("Error while receiving reservation or No Res Exists");
+    //   console.log(error);
+    // });
+    reservationPromise.then(this.getallFops).catch((error) => {
       console.log("Error while receiving reservation or No Res Exists");
       console.log(error);
     });
   }
 
-  getAcLines(): void {
+  workflow = async () => {
+    let call1 = await this.Start2();
+    console.log(call1);
+    let call2 = await this.Middle2();
+    console.log(call2);
+    let call3 = await this.End2();
+    console.log(call3);
+  };
+
+  getallFops = async () => {
+    // populate existing accounting lines...
+    console.log(`now calling getExistingAcLines`);
+    let response1 = await this.getExistingAcLines();
+    console.log(response1);
+
+    // get all FOP's found in *-, AC Lines, Tickets and T#
+    // put into an array for a dropdown list
+    // tag a specific one that is the primary...
+    let fopList: any = [];
+    console.log(`now calling getFormOfPaymentLine`);
+    let method1 = await this.getFormOfPaymentLine();
+    console.log(method1);
+
+    fopList.concat(method1);
+    this.setState({
+      fops: method1,
+    });
+    console.log(`now calling getCreditCardInfoFromAccountingLines`);
+
+    let response2 = this.getCreditCardInfoFromAccountingLines();
+    console.log(response2);
+
+    console.log(`end now calling getCreditCardInfoFromAccountingLines`);
+  };
+
+  getFormOfPaymentLine = async (): Promise<string> => {
+    // Method #1: From the *- entry
+    let status: string = "started";
+    let fopList: any = [];
+    let getFop: string = this.cfHelper.getXmlPayload("SabreCommandLLSRQ", {
+      HostCommand: "*-",
+    });
+    getService(CommFoundHelper)
+      .sendSWSRequest({
+        action: "SabreCommandLLSRQ",
+        payload: getFop,
+        authTokenType: "SESSION",
+      })
+      .then((res) => {
+        console.log(res);
+
+        const parser = new DOMParser();
+        let thexml = res.value;
+        const xml = parser.parseFromString(thexml, "application/xml");
+        // return all the items in the response (lines)
+        let fopsXml: any = xml.getElementsByTagName("Response")[0].childNodes;
+        let fopCount: number = fopsXml.length - 1;
+        // loop through the values
+
+        console.log(
+          `There are ${fopCount} (*-) Lines in this PNR (the header is usually remarks)`
+        );
+        // starting at 1 because the 0th is the Remarks header response
+        for (var i = 1; i < fopsXml.length; i++) {
+          // declare variable
+          let thisfop = new Fops();
+          let thisvalue = xml.getElementsByTagName("Response")[0].childNodes[i]
+            .nodeValue;
+          console.log(thisvalue);
+          // does this match the regexs?
+          const re = [/([A-Z]{2})([0-9]{13,19})/, /-CHECK/];
+          // loop through all the p# remarks to see if they match the regex
+          for (var reloop = 0; reloop < re.length; reloop++) {
+            const match = re[reloop].exec(thisvalue);
+            if (match) {
+              thisfop.Id = reloop;
+              if (reloop === 0) {
+                thisfop.isPrimary = true;
+              } else {
+                thisfop.isPrimary = false;
+              }
+              if (reloop === 0) {
+                thisfop.CardCode = match[1];
+                thisfop.CardNumber = match[2];
+                thisfop.Type = "CC";
+              } else {
+                thisfop.Type = "CK";
+              }
+              fopList.push(thisfop);
+            }
+          }
+        }
+        // list of the fops
+        console.log(fopList);
+        return fopList;
+      })
+
+      .catch((Error) => {
+        console.log(`Unable to determine the default FOP?`);
+        this.setState({
+          fopMessage: `Unable to determine the default FOP (Error on Get FOP Remarks)`,
+        });
+      });
+    status = "completed";
+    return status;
+  };
+
+  getCreditCardInfoFromAccountingLines = async (): Promise<string> => {
+    // see if in the list already, if not then add
+    console.log(`searching existing ac lines for more possible fops`);
+    let status: string = "started";
+    let acLines = this.state.AccountingLineList;
+    let fops = this.state.fops;
+
+    console.log(acLines);
+    console.log(fops);
+
+    for (var i = 0; i < acLines.length; i++) {
+      // is this item in the existing fops
+      const found = fops.find(
+        ({ CardType, CardNumber }) =>
+          CardType === acLines[i].CreditCardCode &&
+          CardNumber === acLines[i].CreditCardNumber
+      );
+      console.log(found);
+    }
+    console.log(`end of getCreditCardInfoFromAccountingLines`);
+    status = "finished";
+    return status;
+  };
+
+  getExistingAcLines = async (): Promise<string> => {
     console.log(`Get Latest AC List`);
+
+    let status: string = "starting";
     //get accounting lines
     let getPNR = this.cfHelper.getXmlPayload("GetReservationRQ", {});
     console.log(getPNR);
@@ -244,8 +410,10 @@ export class AccountingLinePopover extends React.Component<
                 ])),
                 (acline.isChange = false),
                 (acline.isExisting = true),
+                (acline.useDefault = false),
                 console.log(`${acline}`);
               // need to test multiple ac lines
+
               acs.push(acline);
             });
             console.log(acs);
@@ -260,6 +428,29 @@ export class AccountingLinePopover extends React.Component<
           }
         }
       });
+    status = "ending";
+    return status;
+  };
+
+  Start2(): Promise<string> {
+    return new Promise(function (resolve) {
+      console.log(`Starting the Start`);
+      setTimeout(() => resolve("Start has finished"), 5000);
+    });
+  }
+
+  Middle2(): Promise<string> {
+    return new Promise(function (resolve) {
+      console.log(`Starting the Middle`);
+      setTimeout(() => resolve("Middle has finished"), 2000);
+    });
+  }
+
+  End2(): Promise<string> {
+    return new Promise(function (resolve) {
+      console.log(`Starting the End`);
+      setTimeout(() => resolve("End has finished"), 1000);
+    });
   }
 
   handleDismiss() {
@@ -290,29 +481,20 @@ export class AccountingLinePopover extends React.Component<
 
   handleCheck = (id: number) => (e): void => {
     // this handles someone clicked on the checkbox
-    //this.setState({ [e.target.name]: !this.state[e.target.name] });
-
-    // this.setState((prev) => ({
-    //   useCC: prev.useCC.map((val, i) =>
-    //     !val && i === id ? true : val
-    //   ),
-    // }));
-
-    // console.log(`${e.target.name} change to ${e.target.value}`);
-    // const target = e.target;
-    // const value = target.type === "checkbox" ? target.checked : target.value;
-    // const name = target.name;
-
+    console.log(
+      `clicked on ${e.target.name} with a value of ${e.target.value} for id${id} and ${e.target.checked}`
+    );
+    const name: string = e.target.name;
+    const val: boolean = e.target.checked;
     const doc = this.state.AccountingLineList.map((i) =>
       i.Id == id
         ? {
             ...i,
-            [e.target.name]: !this.state[e.target.name],
+            [name]: val,
             isChange: true,
           }
         : i
     );
-
     this.setState({
       AccountingLineList: doc,
     });
@@ -340,7 +522,7 @@ export class AccountingLinePopover extends React.Component<
           success = false;
         }
         // if you refresh the ac lines then the component will re-render
-        this.getAcLines();
+        this.getExistingAcLines();
         // display message about status of delete action
         this.setState({
           response: res.Status.Messages[0].Text,
@@ -396,7 +578,7 @@ export class AccountingLinePopover extends React.Component<
           NumberOfConjunctedDocuments: "",
           TariffBasis: "",
           FreeFormText: "",
-          useCC: true,
+          useDefault: true,
         },
       ],
     }));
@@ -485,6 +667,12 @@ export class AccountingLinePopover extends React.Component<
   renderButtons(): JSX.Element[] {
     return [
       <Button
+        name="btnWorkflow"
+        type="cancel"
+        title="Test Workflow"
+        handleClick={this.workflow}
+      />,
+      <Button
         name="btnCancel"
         type="cancel"
         title="Cancel"
@@ -533,6 +721,10 @@ export class AccountingLinePopover extends React.Component<
         navigation={this.props.navigation}
       >
         <div className="sas-main-popover-accounting-line">
+          Default FOP: {this.state.primaryFop}{" "}
+          {this.state.primaryCreditCardCode}{" "}
+          {this.state.primaryCreditCardNumber}
+          {this.state.fopMessage}
           <form noValidate onSubmit={this.handleExecute} autoComplete="off">
             <table className="table">
               <thead>
@@ -569,25 +761,34 @@ export class AccountingLinePopover extends React.Component<
                       />
                     </td>
                     <td>
+                      {s.useDefault}
                       <span
                         className={
-                          "form-prefremark " + (s.useCC ? "hideit" : "")
+                          "form-prefremark " +
+                          (s.useDefault === true ? "hideit" : "")
                         }
                       >
-                        <FormControl
+                        <input
                           type="text"
-                          name="FOP"
-                          value={s.FOP}
+                          name="CreditCardCode"
+                          value={s.CreditCardCode}
+                          onChange={this.handleChange(s.Id)}
+                        />
+                        <input
+                          type="text"
+                          name="CreditCardNumber"
+                          value={s.CreditCardNumber}
                           onChange={this.handleChange(s.Id)}
                         />
                       </span>
 
                       <input
                         type="checkbox"
-                        name="useCC"
-                        checked={s.useCC}
+                        name="useDefault"
+                        checked={s.useDefault}
                         onChange={this.handleCheck(s.Id)}
                       />
+                      <label>Use Default {s.FOP}</label>
                     </td>
 
                     <td>
